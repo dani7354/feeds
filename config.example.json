@@ -1,0 +1,20 @@
+{
+  "email":{
+    "smtp_server": "",
+    "smtp_port": "587",
+    "smtp_user": "",
+    "smtp_password": "",
+    "recipients": [],
+    "sender": ""
+  },
+  "feeds_by_type": {
+    "rss": [
+      {
+        "name": "RSS Feed 1",
+        "url": "https://www.example.com/rss1",
+        "data_dir": "data/rss/rss_feed_1"
+      }
+    ]
+
+    }
+}
