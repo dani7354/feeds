@@ -24,11 +24,12 @@ class CheckMyFeedsJob:
 
     def _get_email_client(self) -> EmailClient:
         email_client_config = Configuration(
-            smtp_host=self.config["email"]["smtp_host"],
+            smtp_host=self.config["email"]["smtp_server"],
             smtp_port=self.config["email"]["smtp_port"],
             smtp_user=self.config["email"]["smtp_user"],
             smtp_password=self.config["email"]["smtp_password"],
-            sender=self.config["email"]["sender"])
+            sender=self.config["email"]["sender"],
+            recipients=self.config["email"]["recipients"])
         email_client = StandardSMTP(email_client_config)
 
         return email_client
