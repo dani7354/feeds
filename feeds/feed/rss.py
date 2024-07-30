@@ -1,11 +1,12 @@
-from feeds.feed.base import FeedChecker
-from enum import StrEnum
-from feeds.http.client import HTTPClientBase
-from datetime import datetime
-from feeds.email.client import EmailClient, EmailMessage
-from feeds.shared.helper import hash_equals
-import xml.etree.ElementTree as ET
 import os
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from enum import StrEnum
+
+from feeds.email.client import EmailClient, EmailMessage
+from feeds.feed.base import FeedChecker
+from feeds.http.client import HTTPClientBase
+from feeds.shared.helper import hash_equals
 
 
 class ConfigKeys(StrEnum):
@@ -16,7 +17,7 @@ class ConfigKeys(StrEnum):
 
 
 class RSSFeedChecker(FeedChecker):
-    CHANNEL = "channel"
+    CHANNEL_ITEMS = "channel/item"
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict):
         super().__init__(config)
@@ -45,10 +46,10 @@ class RSSFeedChecker(FeedChecker):
         feed_path = os.path.join(self.config[ConfigKeys.DIR], latest_feed)
         tree = ET.parse(feed_path)
 
-        channel_new_feed = new_feed.find(self.CHANNEL)
-        channel_old_feed = tree.find(self.CHANNEL)
+        channel_new_feed = b"".join(ET.tostring(x) for x in new_feed.findall(self.CHANNEL_ITEMS))
+        channel_old_feed = b"".join(ET.tostring(x) for x in tree.findall(self.CHANNEL_ITEMS))
 
-        return not hash_equals(ET.tostring(channel_old_feed), ET.tostring(channel_new_feed))
+        return not hash_equals(channel_old_feed, channel_new_feed)
 
     def _save_feed(self, feed: ET.ElementTree) -> None:
         feed_name = f"{self.config[ConfigKeys.NAME]}_{datetime.now().strftime('%Y-%m-%d_%H_%M')}.xml"
