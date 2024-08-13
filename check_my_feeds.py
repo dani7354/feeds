@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-from datetime import date
-from typing import Any
-from feeds.http.client import HTTPClientBase, HTTPClient
-from feeds.settings import MAX_THREAD_COUNT, CONFIG_PATH
-from feeds.feed.factory import create_feed_checkers
-from feeds.email.client import StandardSMTP, Configuration, EmailClient
-from feeds.feed.base import FeedChecker
-import os
 import json
 import logging
+import os
+import time
+from datetime import date
+from typing import Any
+
+import schedule
+
+from feeds.email.client import StandardSMTP, Configuration, EmailClient
+from feeds.feed.base import FeedChecker
+from feeds.feed.factory import create_feed_checkers
+from feeds.http.client import HTTPClientBase, HTTPClient
+from feeds.settings import CONFIG_PATH
 
 
 class CheckMyFeedsJob:
@@ -44,7 +48,18 @@ class CheckMyFeedsJob:
 
     def run(self) -> None:
         for feed_checker in self.get_feed_checkers():
+            self.logger.info(f"Running feed checker {feed_checker.name}...")
             feed_checker.check()
+            self.logger.info(f"Finished running {feed_checker.name}.")
+
+            self.logger.debug(f"Setting up scheduling for feed {feed_checker.name}...")
+            schedule.every().hour.do(feed_checker.check)
+            self.logger.info(f"{feed_checker.name} scheduled to run every hour.")
+
+        self.logger.info("Feed checkers set up successfully! Running scheduled jobs...")
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
 
 
 def _load_config() -> dict[str, Any]:
