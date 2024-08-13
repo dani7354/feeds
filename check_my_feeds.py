@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from datetime import date
+from typing import Any
 from feeds.http.client import HTTPClientBase, HTTPClient
 from feeds.settings import MAX_THREAD_COUNT, CONFIG_PATH
 from feeds.feed.factory import create_feed_checkers
@@ -6,11 +8,13 @@ from feeds.email.client import StandardSMTP, Configuration, EmailClient
 from feeds.feed.base import FeedChecker
 import os
 import json
+import logging
 
 
 class CheckMyFeedsJob:
     def __init__(self, config: dict):
         self.config = config
+        self.logger = logging.getLogger("CheckMyFeeds")
 
     def get_feed_checkers(self) -> list[FeedChecker]:
         email_client = self._get_email_client()
@@ -38,18 +42,30 @@ class CheckMyFeedsJob:
     def _get_http_client() -> HTTPClientBase:
         return HTTPClient({})
 
-    def run(self):
+    def run(self) -> None:
         for feed_checker in self.get_feed_checkers():
             feed_checker.check()
 
 
-def load_config() -> dict:
+def _load_config() -> dict[str, Any]:
     with open(CONFIG_PATH, "r") as config_file:
         return json.load(config_file)
 
 
+def _setup_logging(config: dict[str, Any]) -> None:
+    conf_section = config["logging"]
+    loglevel = conf_section["level"]
+    directory = conf_section["dir"]
+    filename_base = f"CheckMyFeedsJob_{date.today().month:02d}-{date.today().year}.log"
+    logfile = os.path.join(directory, filename_base)
+    logging.basicConfig(
+        filename=logfile, filemode="a", format='%(asctime)s - %(levelname)s: %(message)s', level=loglevel)
+    logging.getLogger().addHandler(logging.StreamHandler())
+
+
 def main():
-    config = load_config()
+    config = _load_config()
+    _setup_logging(config)
     job = CheckMyFeedsJob(config)
     job.run()
 
