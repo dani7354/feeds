@@ -2,6 +2,9 @@ venv/
 data/*
 !data/.empty
 
+logs/*
+!logs/.empty
+
 config.*.json
 !config.example.json
 
