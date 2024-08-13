@@ -9,6 +9,7 @@ from typing import Any
 import schedule
 
 from feeds.email.client import StandardSMTP, Configuration, EmailClient
+from feeds.feed.base import FeedCheckFailedError
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
 from feeds.http.client import HTTPClientBase, HTTPClient
@@ -58,8 +59,11 @@ class CheckMyFeedsJob:
 
         self.logger.info("Feed checkers set up successfully! Running scheduled jobs...")
         while True:
-            schedule.run_pending()
-            time.sleep(1)
+            try:
+                schedule.run_pending()
+                time.sleep(1)
+            except FeedCheckFailedError as ex:
+                self.logger.error(f"Error running scheduled jobs: {ex}")
 
 
 def _load_config() -> dict[str, Any]:

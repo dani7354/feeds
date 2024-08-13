@@ -1,3 +1,4 @@
+import logging
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -23,22 +24,26 @@ class RSSFeedChecker(FeedChecker):
         super().__init__(config)
         self._http_client = http_client
         self._email_client = email_client
+        self._logger = logging.getLogger("RSSFeedChecker")
 
     def check(self) -> None:
-        feed_dir = self.config[ConfigKeys.DIR]
-        if not os.path.exists(feed_dir):
-            os.mkdir(feed_dir)
+        try:
+            feed_dir = self.config[ConfigKeys.DIR]
+            if not os.path.exists(feed_dir):
+                os.mkdir(feed_dir)
 
-        url = self.config[ConfigKeys.URL]
-        feed = self._http_client.get_response_string(url)
-        if not feed:
-            raise FeedCheckFailedError(f"Failed to download feed at {url}")
+            url = self.config[ConfigKeys.URL]
+            feed = self._http_client.get_response_string(url)
+            if not feed:
+                raise FeedCheckFailedError(f"Failed to download feed at {url}")
 
-        rss_tree = ET.ElementTree(ET.fromstring(feed))
-        if self._feed_content_updated(rss_tree):
-            self._save_feed(rss_tree)
-            self._send_notification_email()
-            self._remove_old_feeds()
+            rss_tree = ET.ElementTree(ET.fromstring(feed))
+            if self._feed_content_updated(rss_tree):
+                self._save_feed(rss_tree)
+                self._send_notification_email()
+                self._remove_old_feeds()
+        except Exception as ex:
+            raise FeedCheckFailedError(f"Error checking RSS feed {self.config[ConfigKeys.NAME]}: {ex}")
 
     def _feed_content_updated(self, new_feed_tree: ET.ElementTree) -> bool:
         saved_feeds = self._list_data_dir(descending=True)
@@ -65,7 +70,7 @@ class RSSFeedChecker(FeedChecker):
         body = (f"RSS feed {self.config[ConfigKeys.NAME]} has been updated. See {self.config[ConfigKeys.URL]} "
                 f"or downloaded file in {self.config[ConfigKeys.DIR]}.")
         message = EmailMessage(subject=subject, body=body)
-        #self._email_client.send_email(message)
+        self._email_client.send_email(message)
 
     def _remove_old_feeds(self) -> None:
         saved_feeds = self._list_data_dir(descending=False)
