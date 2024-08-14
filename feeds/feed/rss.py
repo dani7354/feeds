@@ -72,10 +72,10 @@ class RSSFeedChecker(FeedChecker):
         body = (f"RSS feed {self.config[ConfigKeys.NAME]} has been updated. See {self.config[ConfigKeys.URL]} "
                 f"or downloaded file in {self.config[ConfigKeys.DIR]}.")
         message = EmailMessage(subject=subject, body=body)
-        self._email_client.send_email(message)
+        #self._email_client.send_email(message)
 
     def _remove_old_feeds(self) -> None:
-        saved_feeds = self._list_data_dir(descending=False)
+        saved_feeds = self._list_data_dir(descending=True)
         if len(saved_feeds) > self.config[ConfigKeys.SAVED_FEEDS_COUNT]:
             for feed in saved_feeds[self.config[ConfigKeys.SAVED_FEEDS_COUNT]:]:
                 self._logger.debug("Removing old feed %s...", feed)
