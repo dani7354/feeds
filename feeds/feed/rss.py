@@ -39,6 +39,7 @@ class RSSFeedChecker(FeedChecker):
 
             rss_tree = ET.ElementTree(ET.fromstring(feed))
             if self._feed_content_updated(rss_tree):
+                self._logger.debug(f"Feed %s updated. Saving feed...", self.config[ConfigKeys.NAME])
                 self._save_feed(rss_tree)
                 self._send_notification_email()
                 self._remove_old_feeds()
@@ -63,6 +64,7 @@ class RSSFeedChecker(FeedChecker):
 
     def _save_feed(self, feed: ET.ElementTree) -> None:
         feed_name = f"{self.config[ConfigKeys.NAME]}_{datetime.now().strftime('%Y-%m-%d_%H_%M')}.xml"
+        self._logger.debug("Writing feed %s", feed_name)
         feed.write(os.path.join(self.config[ConfigKeys.DIR], feed_name))
 
     def _send_notification_email(self) -> None:
@@ -76,6 +78,7 @@ class RSSFeedChecker(FeedChecker):
         saved_feeds = self._list_data_dir(descending=False)
         if len(saved_feeds) > self.config[ConfigKeys.SAVED_FEEDS_COUNT]:
             for feed in saved_feeds[self.config[ConfigKeys.SAVED_FEEDS_COUNT]:]:
+                self._logger.debug("Removing old feed %s...", feed)
                 os.remove(os.path.join(self.config[ConfigKeys.DIR], feed))
 
     def _list_data_dir(self, descending: bool) -> list[str]:
