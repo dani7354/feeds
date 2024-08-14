@@ -8,6 +8,8 @@ logs/*
 config.*.json
 !config.example.json
 
+*.env
+
 __pycache__/
 .idea/
 .vscode/*

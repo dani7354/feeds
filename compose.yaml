@@ -1,0 +1,12 @@
+services:
+  feeds:
+    image: dsp9ef8/feeds:latest
+    container_name: feeds
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file: feeds.env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config.dev.json:/app/config.dev.json:ro
