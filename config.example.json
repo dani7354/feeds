@@ -16,5 +16,9 @@
       }
     ]
 
-    }
+    },
+  "logging": {
+    "dir": "logs/",
+    "level": "info"
+  }
 }
