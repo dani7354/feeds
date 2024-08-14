@@ -1,8 +1,8 @@
-from email.header import Header
-from email.mime.text import MIMEText
 import dataclasses
 import smtplib
 import ssl
+from email.header import Header
+from email.mime.text import MIMEText
 from typing import Sequence
 
 
@@ -31,11 +31,9 @@ class EmailClient:
 
 
 class StandardSMTP(EmailClient):
-    def __init__(self, configuration: Configuration):
-        super().__init__(configuration)
 
-    def send_email(self, message: EmailMessage) -> None:
-        mime_message = self._create_message_str(message)
+    def send_email(self, email: EmailMessage) -> None:
+        mime_message = self._create_message_str(email)
         context = ssl.create_default_context()
         with smtplib.SMTP(host=self.configuration.smtp_host, port=self.configuration.smtp_port) as mail_server:
             mail_server.starttls(context=context)

@@ -49,13 +49,13 @@ class CheckMyFeedsJob:
 
     def run(self) -> None:
         for feed_checker in self.get_feed_checkers():
-            self.logger.info(f"Running feed checker {feed_checker.name}...")
+            self.logger.info("Running feed checker %s...", feed_checker.name)
             feed_checker.check()
-            self.logger.info(f"Finished running {feed_checker.name}.")
+            self.logger.info("Finished running %s.", feed_checker.name)
 
-            self.logger.debug(f"Setting up scheduling for feed {feed_checker.name}...")
+            self.logger.debug("Setting up scheduling for feed %s...", feed_checker.name)
             schedule.every().hour.do(feed_checker.check)
-            self.logger.info(f"{feed_checker.name} scheduled to run every hour.")
+            self.logger.info("%s scheduled to run every hour.", feed_checker.name)
 
         self.logger.info("Feed checkers set up successfully! Running scheduled jobs...")
         while True:
@@ -63,11 +63,11 @@ class CheckMyFeedsJob:
                 schedule.run_pending()
                 time.sleep(1)
             except FeedCheckFailedError as ex:
-                self.logger.error(f"Error running scheduled jobs: {ex}")
+                self.logger.error("Error running scheduled jobs: %s", ex)
 
 
 def _load_config() -> dict[str, Any]:
-    with open(CONFIG_PATH, "r") as config_file:
+    with open(CONFIG_PATH, "r", encoding="utf-8") as config_file:
         return json.load(config_file)
 
 

@@ -1,8 +1,9 @@
-from enum import Enum, StrEnum
+from enum import StrEnum
 from typing import Any
+
+from feeds.email.client import EmailClient
 from feeds.feed.base import FeedChecker
 from feeds.feed.rss import RSSFeedChecker
-from feeds.email.client import EmailClient
 from feeds.http.client import HTTPClientBase
 
 
