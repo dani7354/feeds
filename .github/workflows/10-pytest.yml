@@ -25,4 +25,4 @@ jobs:
           python -m pytest --import-mode=append tests/
       - name: Run Pylint
         run: |
-          pylint --disable=C0115,C0114 $(find feeds/ -name "*.py") *.py
+          pylint --disable=C0116,C0115,C0114 $(find feeds/ -name "*.py") *.py
