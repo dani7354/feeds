@@ -27,7 +27,8 @@ class CheckMyFeedsJob:
         feed_checkers = create_feed_checkers(
             email_client=email_client,
             http_client=http_client,
-            feeds_by_type=self.config["feeds_by_type"])
+            feeds_by_type=self.config["feeds_by_type"],
+        )
 
         return feed_checkers
 
@@ -38,7 +39,8 @@ class CheckMyFeedsJob:
             smtp_user=self.config["email"]["smtp_user"],
             smtp_password=self.config["email"]["smtp_password"],
             sender=self.config["email"]["sender"],
-            recipients=self.config["email"]["recipients"])
+            recipients=self.config["email"]["recipients"],
+        )
         email_client = StandardSMTP(email_client_config)
 
         return email_client
@@ -78,7 +80,11 @@ def _setup_logging(config: dict[str, Any]) -> None:
     filename_base = f"CheckMyFeedsJob_{date.today().month:02d}-{date.today().year}.log"
     logfile = os.path.join(directory, filename_base)
     logging.basicConfig(
-        filename=logfile, filemode="a", format='%(asctime)s - %(levelname)s: %(message)s', level=loglevel)
+        filename=logfile,
+        filemode="a",
+        format="%(asctime)s - %(levelname)s: %(message)s",
+        level=loglevel,
+    )
     logging.getLogger().addHandler(logging.StreamHandler())
 
 

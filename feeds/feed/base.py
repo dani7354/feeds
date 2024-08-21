@@ -1,5 +1,3 @@
-
-
 class FeedCheckFailedError(Exception):
     pass
 
@@ -13,5 +11,5 @@ class FeedChecker:
         return self.config["name"]
 
     def check(self) -> None:
-        """ Should be overwritten by subclasses """
+        """Should be overwritten by subclasses"""
         raise NotImplementedError

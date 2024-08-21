@@ -18,11 +18,14 @@ class FeedType(StrEnum):
 def create_feed_checkers(
         feeds_by_type: dict[str, list[dict[str, Any]]],
         email_client: EmailClient,
-        http_client: HTTPClientBase) -> list[FeedChecker]:
+        http_client: HTTPClientBase,
+) -> list[FeedChecker]:
     feed_checkers = []
     for feed_type, feeds in feeds_by_type.items():
         if feed_type == FeedType.RSS:
-            feed_checkers.extend(RSSFeedChecker(email_client, http_client, feed) for feed in feeds)
+            feed_checkers.extend(
+                RSSFeedChecker(email_client, http_client, feed) for feed in feeds
+            )
         else:
             raise FeedFactoryError(f"Unknown feed type: {feed_type}")
 
