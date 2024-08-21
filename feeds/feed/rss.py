@@ -1,10 +1,13 @@
 import logging
 import os
 import xml.etree.ElementTree as ET
+from collections.abc import Sequence
 from datetime import datetime
 from enum import StrEnum
+from typing import NamedTuple
 
 from feeds.email.client import EmailClient, EmailMessage
+from feeds.email.html import create_table, create_heading_two
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.http.client import HTTPClientBase
 from feeds.shared.helper import hash_equals
@@ -15,6 +18,13 @@ class ConfigKeys(StrEnum):
     DIR = "data_dir"
     SAVED_FEEDS_COUNT = "saved_feeds_count"
     NAME = "name"
+
+
+class RssItem(NamedTuple):
+    title: str
+    link: str
+    published_date: str
+
 
 
 class RSSFeedChecker(FeedChecker):
@@ -41,10 +51,22 @@ class RSSFeedChecker(FeedChecker):
             if self._feed_content_updated(rss_tree):
                 self._logger.debug("Feed %s updated. Saving feed...", self.config[ConfigKeys.NAME])
                 self._save_feed(rss_tree)
-                self._send_notification_email()
+                rss_items = self._parse_feed_items(rss_tree)
+                self._send_notification_email(rss_items)
                 self._remove_old_feeds()
         except Exception as ex:
             raise FeedCheckFailedError(f"Error checking RSS feed {self.config[ConfigKeys.NAME]}: {ex}") from ex
+
+    def _parse_feed_items(self, tree: ET.ElementTree) -> list[RssItem]:
+        rss_items = []
+        for item in tree.findall(self.CHANNEL_ITEMS):
+            self._logger.debug("Parsing item %s", ET.tostring(item))
+            title = item.find("title").text
+            link = item.find("link").text
+            published_date = item.find("pubDate").text
+            rss_items.append(RssItem(title, link, published_date))
+
+        return rss_items
 
     def _feed_content_updated(self, new_feed_tree: ET.ElementTree) -> bool:
         saved_feeds = self._list_data_dir(descending=True)
@@ -67,10 +89,14 @@ class RSSFeedChecker(FeedChecker):
         self._logger.debug("Writing feed %s", feed_name)
         feed.write(os.path.join(self.config[ConfigKeys.DIR], feed_name))
 
-    def _send_notification_email(self) -> None:
+    def _send_notification_email(self, rss_items: Sequence[RssItem]) -> None:
         subject = f"RSS feed {self.config[ConfigKeys.NAME]} updated!"
-        body = (f"RSS feed {self.config[ConfigKeys.NAME]} has been updated. See {self.config[ConfigKeys.URL]} "
-                f"or downloaded file in {self.config[ConfigKeys.DIR]}.")
+        rss_items_formatted = [f"{x.published_date}: <a href=\"{x.link}\">{x.title}</a>" for x in rss_items]
+
+        html_heading = create_heading_two(self.config[ConfigKeys.NAME])
+        html_table = create_table(rss_items_formatted)
+
+        body = f"{html_heading}\n{html_table}"
         message = EmailMessage(subject=subject, body=body)
         self._email_client.send_email(message)
 
