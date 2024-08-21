@@ -7,7 +7,7 @@ from enum import StrEnum
 from typing import NamedTuple
 
 from feeds.email.client import EmailClient, EmailMessage
-from feeds.email.html import create_table, create_heading_two
+from feeds.email.html import create_table, create_heading_two, create_link
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.http.client import HTTPClientBase
 from feeds.shared.helper import hash_equals
@@ -90,11 +90,11 @@ class RSSFeedChecker(FeedChecker):
         feed.write(os.path.join(self.config[ConfigKeys.DIR], feed_name))
 
     def _send_notification_email(self, rss_items: Sequence[RssItem]) -> None:
-        subject = f"RSS feed {self.config[ConfigKeys.NAME]} updated!"
-        rss_items_formatted = [f"{x.published_date}: <a href=\"{x.link}\">{x.title}</a>" for x in rss_items]
+        subject = f"RSS-feed {self.config[ConfigKeys.NAME]} opdateret"
+        rss_items_formatted = [(x.published_date, create_link(x.link, x.title)) for x in rss_items]
 
         html_heading = create_heading_two(self.config[ConfigKeys.NAME])
-        html_table = create_table(rss_items_formatted)
+        html_table = create_table(["Oprettet", "Link"], rss_items_formatted)
 
         body = f"{html_heading}\n{html_table}"
         message = EmailMessage(subject=subject, body=body)
