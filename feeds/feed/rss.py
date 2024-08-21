@@ -51,8 +51,7 @@ class RSSFeedChecker(FeedChecker):
             if self._feed_content_updated(rss_tree):
                 self._logger.debug("Feed %s updated. Saving feed...", self.config[ConfigKeys.NAME])
                 self._save_feed(rss_tree)
-                rss_items = self._parse_feed_items(rss_tree)
-                self._send_notification_email(rss_items)
+                self._send_notification_email(self._parse_feed_items(rss_tree))
                 self._remove_old_feeds()
         except Exception as ex:
             raise FeedCheckFailedError(f"Error checking RSS feed {self.config[ConfigKeys.NAME]}: {ex}") from ex
