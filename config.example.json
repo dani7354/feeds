@@ -14,8 +14,15 @@
         "url": "https://www.example.com/rss1",
         "data_dir": "data/rss/rss_feed_1"
       }
+    ],
+    "web_availability": [
+      {
+        "name": "Web Availability 1",
+        "url": "https://www.example.com",
+        "data_dir": "data/web_availability/web_availability_1",
+        "expected_status_code": 200
+      }
     ]
-
     },
   "logging": {
     "dir": "logs/",
