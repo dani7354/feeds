@@ -38,8 +38,9 @@ class WebServiceAvailabilityChecker(FeedChecker):
             self.config[ConfigKeys.DIR], self._request_log_filename
         )
         last_status_code = self._get_latest_status_code(requests_log)
+        expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
         logger.debug("Last status code: %s", last_status_code)
-        if last_status_code == self.config[ConfigKeys.EXPECTED_STATUS_CODE]:
+        if last_status_code == expected_status_code:
             self.logger.info(
                 "Service is available (status code %s). Check is skipped!",
                 last_status_code,
@@ -48,8 +49,6 @@ class WebServiceAvailabilityChecker(FeedChecker):
 
         url = self.config[ConfigKeys.URL]
         name = self.config[ConfigKeys.NAME]
-        expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
-
         logger.debug("Checking availability of web service at %s...", url)
         status_code = self._http_client.get_response_code(url)
         if status_code == expected_status_code:
