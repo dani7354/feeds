@@ -6,6 +6,9 @@ class HTTPClientBase:
     def get_response_string(self, url: str) -> str:
         pass
 
+    def get_response_code(self, url: str) -> int:
+        pass
+
 
 class HTTPClient(HTTPClientBase):
     def __init__(self, headers: dict):

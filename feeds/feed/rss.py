@@ -85,7 +85,8 @@ class RSSFeedChecker(FeedChecker):
         latest_saved_feed_tree = ET.parse(latest_saved_feed_path)
 
         channel_old_feed_bytes = b"".join(
-            ET.tostring(x) for x in latest_saved_feed_tree.findall(self._channel_items_path)
+            ET.tostring(x)
+            for x in latest_saved_feed_tree.findall(self._channel_items_path)
         )
         channel_new_feed_bytes = b"".join(
             ET.tostring(x) for x in new_feed_tree.findall(self._channel_items_path)
