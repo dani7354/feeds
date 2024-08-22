@@ -29,7 +29,7 @@ def create_feed_checkers(
                 RSSFeedChecker(email_client, http_client, feed) for feed in feeds
             )
         elif feed_type == FeedType.WEB_AVAILABILITY:
-            feed_checkers.append(
+            feed_checkers.extend(
                 WebServiceAvailabilityChecker(email_client, http_client, feed)
                 for feed in feeds
             )

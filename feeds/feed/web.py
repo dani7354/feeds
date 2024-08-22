@@ -31,6 +31,9 @@ class WebServiceAvailabilityChecker(FeedChecker):
         self.logger = logging.getLogger("WebServiceAvailabilityChecker")
 
     def check(self) -> None:
+        if not os.path.exists(self.config[ConfigKeys.DIR]):
+            logger.info("Creating directory %s...", self.config[ConfigKeys.DIR])
+            os.makedirs(self.config[ConfigKeys.DIR])
         requests_log = os.path.join(
             self.config[ConfigKeys.DIR], self._request_log_filename
         )
