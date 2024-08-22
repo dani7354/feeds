@@ -35,14 +35,16 @@ class WebServiceAvailabilityChecker(FeedChecker):
             return
 
         url = self.config[ConfigKeys.URL]
+        name = self.config[ConfigKeys.NAME]
         expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
 
         logger.debug("Checking availability of web service at %s...", url)
         status_code = self._http_client.get_response_code(url)
         if status_code == expected_status_code:
-            subject = f"Web service {self.config[ConfigKeys.NAME]} returns status code {status_code}"
+            subject = f"Web service {name} returns status code {status_code}"
             body = f"Web service at {url} is returning status code {status_code}"
             message = EmailMessage(subject=subject, body=body)
+            self._log_status_code(requests_log, status_code)
             self._email_client.send_email(message)
 
     def _get_latest_status_code(self, request_log_path: str) -> int | None:
