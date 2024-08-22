@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Sequence
 from datetime import datetime
 from enum import StrEnum
-from typing import NamedTuple
+from typing import NamedTuple, ClassVar
 
 from feeds.email.client import EmailClient, EmailMessage
 from feeds.email.html import create_table, create_heading_two, create_link
@@ -27,7 +27,10 @@ class RssItem(NamedTuple):
 
 
 class RSSFeedChecker(FeedChecker):
-    CHANNEL_ITEMS = "channel/item"
+    channel_items_path: ClassVar[str] = "channel/item"
+    title_element: ClassVar[str] = "title"
+    link_element: ClassVar[str] = "link"
+    published_date_element: ClassVar[str] = "pubDate"
 
     def __init__(
             self, email_client: EmailClient, http_client: HTTPClientBase, config: dict
@@ -63,11 +66,11 @@ class RSSFeedChecker(FeedChecker):
 
     def _parse_feed_items(self, tree: ET.ElementTree) -> list[RssItem]:
         rss_items = []
-        for item in tree.findall(self.CHANNEL_ITEMS):
+        for item in tree.findall(self.channel_items_path):
             self._logger.debug("Parsing item %s", ET.tostring(item))
-            title = item.find("title").text
-            link = item.find("link").text
-            published_date = item.find("pubDate").text
+            title = item.find(self.title_element).text
+            link = item.find(self.link_element).text
+            published_date = item.find(self.published_date_element).text
             rss_items.append(RssItem(title, link, published_date))
 
         return rss_items
@@ -82,10 +85,10 @@ class RSSFeedChecker(FeedChecker):
         latest_saved_feed_tree = ET.parse(latest_saved_feed_path)
 
         channel_old_feed_bytes = b"".join(
-            ET.tostring(x) for x in latest_saved_feed_tree.findall(self.CHANNEL_ITEMS)
+            ET.tostring(x) for x in latest_saved_feed_tree.findall(self.channel_items_path)
         )
         channel_new_feed_bytes = b"".join(
-            ET.tostring(x) for x in new_feed_tree.findall(self.CHANNEL_ITEMS)
+            ET.tostring(x) for x in new_feed_tree.findall(self.channel_items_path)
         )
         if not channel_new_feed_bytes or not channel_old_feed_bytes:
             raise FeedCheckFailedError(
