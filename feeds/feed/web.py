@@ -31,11 +31,12 @@ class WebServiceAvailabilityChecker(FeedChecker):
         self.logger = logging.getLogger("WebServiceAvailabilityChecker")
 
     def check(self) -> None:
-        if not os.path.exists(self.config[ConfigKeys.DIR]):
-            logger.info("Creating directory %s...", self.config[ConfigKeys.DIR])
-            os.makedirs(self.config[ConfigKeys.DIR])
+        data_dir = self.config[ConfigKeys.DIR]
+        if not os.path.exists(data_dir):
+            logger.info("Creating directory %s...", data_dir)
+            os.makedirs(data_dir)
         requests_log = os.path.join(
-            self.config[ConfigKeys.DIR], self._request_log_filename
+            data_dir, self._request_log_filename
         )
         last_status_code = self._get_latest_status_code(requests_log)
         expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
@@ -60,6 +61,7 @@ class WebServiceAvailabilityChecker(FeedChecker):
 
     def _get_latest_status_code(self, request_log_path: str) -> int | None:
         if not os.path.exists(request_log_path):
+            logger.warning("Request log %s doesn't exist!", request_log_path)
             return None
 
         with open(request_log_path, "r", encoding=self._request_log_encoding) as file:
@@ -70,6 +72,7 @@ class WebServiceAvailabilityChecker(FeedChecker):
 
     def _log_status_code(self, request_log_path: str, status_code: int) -> None:
         with open(request_log_path, "a", encoding=self._request_log_encoding) as file:
+            logger.debug("Writing status code to %s...", request_log_path)
             file.write(
                 f"{datetime.now().isoformat()}{self._record_cell_delimiter}{status_code}\n"
             )
