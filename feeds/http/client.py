@@ -19,6 +19,10 @@ class HTTPClient(HTTPClientBase):
 
         return self._decode_response(response)
 
+    def get_response_code(self, url: str) -> int:
+        response = requests.get(url, headers=self._headers, timeout=self._timeout)
+        return response.status_code
+
     @staticmethod
     def _decode_response(response: Response) -> str:
         try:
