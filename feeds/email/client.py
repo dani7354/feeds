@@ -27,6 +27,7 @@ class EmailClient:
         self.configuration = configuration
 
     def send_email(self, email: EmailMessage) -> None:
+        """Should be overwritten by subclasses"""
         raise NotImplementedError
 
 

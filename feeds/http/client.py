@@ -4,10 +4,12 @@ from requests import Response
 
 class HTTPClientBase:
     def get_response_string(self, url: str) -> str:
-        pass
+        """Should be overwritten by subclasses"""
+        raise NotImplementedError
 
     def get_response_code(self, url: str) -> int:
-        pass
+        """Should be overwritten by subclasses"""
+        raise NotImplementedError
 
 
 class HTTPClient(HTTPClientBase):
