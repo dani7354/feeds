@@ -1,6 +1,6 @@
 services:
   feeds:
-    image: dsp9ef8/feeds:latest
+    image: dsp8ef9/feeds:latest
     container_name: feeds
     build:
       context: ./
