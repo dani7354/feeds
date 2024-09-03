@@ -42,4 +42,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: docker stack deploy -c {{ secrets.DOCKER_COMPOSE }} feeds
+          script: docker stack deploy -c ${{ secrets.DOCKER_COMPOSE }} feeds
