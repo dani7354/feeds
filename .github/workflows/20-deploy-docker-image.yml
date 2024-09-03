@@ -42,4 +42,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: restart_services.sh
+          script: restart_feeds.sh
