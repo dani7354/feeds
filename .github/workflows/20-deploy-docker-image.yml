@@ -26,3 +26,20 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:latest
+
+  deploy_to_production:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://github.com/${{ github.repository }}/releases/tag/v${{ vars.DEV_VERSION }}
+    name: Deployment
+    needs: [ build_docker_images ]
+    steps:
+      - name: Deploy using SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: restart_services.sh
