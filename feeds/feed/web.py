@@ -32,6 +32,10 @@ class WebCheckerBase(FeedChecker):
         self.http_client = http_client
         self.email_client = email_client
 
+    def check(self) -> None:
+        """Should be overwritten by subclasses"""
+        raise NotImplementedError
+
     def get_last_request_status(self, request_log_path: str) -> int | None:
         if not os.path.exists(request_log_path):
             logger.warning("Request log %s doesn't exist!", request_log_path)
