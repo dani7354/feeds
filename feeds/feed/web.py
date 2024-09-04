@@ -131,6 +131,13 @@ class PageContentChecker(WebCheckerBase):
             self.logger.info("Content updated. Saving content...")
             self._write_page_content(str(html_node))
             self.log_request_status(requests_log, self._check_success)
+            subject = f"{name}: content updated!"
+            body = f"Content of {name} at {url} has been updated."
+            message = EmailMessage(subject=subject, body=body)
+            self.email_client.send_email(message)
+        else:
+            self.logger.info("Content not updated")
+            self.log_request_status(requests_log, self._check_failed)
 
     def _write_page_content(self, page_content: str) -> None:
         file_path = os.path.join(self._content_dir_path, f"{datetime.now().isoformat()}.html")
