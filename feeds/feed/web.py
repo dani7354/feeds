@@ -81,11 +81,11 @@ class UrlAvailabilityChecker(WebCheckerBase):
         name = self.config[ConfigKeys.NAME]
         logger.debug("Checking availability of web service at %s...", url)
         status_code = self.http_client.get_response_code(url)
+        self.log_request_status(requests_log, status_code)
         if status_code == expected_status_code:
             subject = f"Web service {name} returns status code {status_code}"
             body = f"Web service at {url} is returning status code {status_code}"
             message = EmailMessage(subject=subject, body=body)
-            self.log_request_status(requests_log, status_code)
             self.email_client.send_email(message)
 
 
