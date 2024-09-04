@@ -9,7 +9,7 @@ from typing import Any
 import schedule
 
 from feeds.email.client import StandardSMTP, Configuration, EmailClient
-from feeds.feed.base import FeedCheckFailedError
+from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
 from feeds.http.client import HTTPClientBase, HTTPClient
@@ -46,6 +46,18 @@ class CheckMyFeedsJob:
         return email_client
 
     @staticmethod
+    def _schedule_check(feed_checker: FeedChecker) -> None:
+        logging.info("%s will run %s.", feed_checker.name, feed_checker.schedule)
+        if feed_checker.schedule == FeedSchedule.HOURLY:
+            schedule.every().hour.do(feed_checker.check)
+        elif feed_checker.schedule == FeedSchedule.DAILY:
+            schedule.every().day.do(feed_checker.check)
+        elif feed_checker.schedule == FeedSchedule.WEEKLY:
+            schedule.every().week.do(feed_checker.check)
+        else:
+            raise ValueError(f"Invalid schedule: {feed_checker.schedule}")
+
+    @staticmethod
     def _get_http_client() -> HTTPClientBase:
         return HTTPClient({})
 
@@ -56,8 +68,7 @@ class CheckMyFeedsJob:
             self.logger.info("Finished running %s.", feed_checker.name)
 
             self.logger.debug("Setting up scheduling for feed %s...", feed_checker.name)
-            schedule.every().hour.do(feed_checker.check)
-            self.logger.info("%s scheduled to run every hour.", feed_checker.name)
+            self._schedule_check(feed_checker)
 
         self.logger.info("Feed checkers set up successfully! Running scheduled jobs...")
         while True:
