@@ -39,7 +39,7 @@ class WebCheckerBase(FeedChecker):
     def get_last_request_status(self, request_log_path: str) -> int | None:
         if not os.path.exists(request_log_path):
             logger.warning("Request log %s doesn't exist!", request_log_path)
-            return
+            return None
 
         with open(request_log_path, "r", encoding=self._request_log_encoding) as file:
             lines = file.readlines()
@@ -92,6 +92,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
 class PageContentChecker(WebCheckerBase):
     _check_success: ClassVar[int] = 0
     _check_failed: ClassVar[int] = 1
+    _content_encoding: ClassVar[str] = "utf-8"
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict):
         super().__init__(http_client, email_client, config)
@@ -133,7 +134,7 @@ class PageContentChecker(WebCheckerBase):
 
     def _write_page_content(self, page_content: str) -> None:
         file_path = os.path.join(self._content_dir_path, f"{datetime.now().isoformat()}.html")
-        with open(file_path, "w", encoding="utf-8") as file:
+        with open(file_path, "w", encoding=self._content_encoding) as file:
             logger.debug("Writing page content to file %s...", file_path)
             file.write(page_content)
 
@@ -144,7 +145,7 @@ class PageContentChecker(WebCheckerBase):
 
         latest_content_file_path = saved_content[0]
         latest_saved_content_path = os.path.join(self._content_dir_path, latest_content_file_path)
-        with open(latest_saved_content_path, "r") as file:
+        with open(latest_saved_content_path, "r", encoding=self._content_encoding) as file:
             return hash_equals(content.encode(), file.read().encode())
 
     def _list_content_dir(self) -> list[str]:
