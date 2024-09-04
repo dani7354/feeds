@@ -93,8 +93,8 @@ class UrlAvailabilityChecker(WebCheckerBase):
 
 
 class PageContentChecker(WebCheckerBase):
-    check_success: ClassVar[int] = 1
-    check_failed: ClassVar[int] = 0
+    check_success: ClassVar[int] = int(True)
+    check_failed: ClassVar[int] = int(False)
     saved_content_count: ClassVar[int] = 50
     _content_encoding: ClassVar[str] = "utf-8"
 
