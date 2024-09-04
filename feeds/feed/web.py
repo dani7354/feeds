@@ -57,7 +57,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict) -> None:
         super().__init__(http_client, email_client, config)
-        self.logger = logging.getLogger("WebServiceAvailabilityChecker")
+        self.logger = logging.getLogger("UrlAvailabilityChecker")
 
     def check(self) -> None:
         data_dir = self.config[ConfigKeys.DIR]
@@ -96,7 +96,7 @@ class PageContentChecker(WebCheckerBase):
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict):
         super().__init__(http_client, email_client, config)
-        self.logger = logging.getLogger("WebServiceContentChecker")
+        self.logger = logging.getLogger("PageContentChecker")
         self._data_dir = self.config[ConfigKeys.DIR]
         self._content_dir_path = os.path.join(self.config[ConfigKeys.DIR], "content")
 
