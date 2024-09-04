@@ -52,6 +52,10 @@ class WebCheckerBase(FeedChecker):
             logger.debug("Writing status code to %s...", request_log_path)
             file.write(f"{datetime.now().isoformat()}{self._record_cell_delimiter}{status}\n")
 
+    def send_email(self, subject: str, body: str) -> None:
+        message = EmailMessage(subject=subject, body=body)
+        self.email_client.send_email(message)
+
 
 class UrlAvailabilityChecker(WebCheckerBase):
 
@@ -83,15 +87,14 @@ class UrlAvailabilityChecker(WebCheckerBase):
         status_code = self.http_client.get_response_code(url)
         self.log_request_status(requests_log, status_code)
         if status_code == expected_status_code:
-            subject = f"Web service {name} returns status code {status_code}"
-            body = f"Web service at {url} is returning status code {status_code}"
-            message = EmailMessage(subject=subject, body=body)
-            self.email_client.send_email(message)
+            self.send_email(
+                subject=f"Web service {name} returns status code {status_code}",
+                body=f"Web service at {url} is returning status code {status_code}")
 
 
 class PageContentChecker(WebCheckerBase):
-    _check_success: ClassVar[int] = 0
-    _check_failed: ClassVar[int] = 1
+    check_success: ClassVar[int] = 1
+    check_failed: ClassVar[int] = 0
     _content_encoding: ClassVar[str] = "utf-8"
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict):
@@ -108,7 +111,7 @@ class PageContentChecker(WebCheckerBase):
             self._data_dir, self._request_log_filename
         )
         last_check = self.get_last_request_status(requests_log)
-        if last_check == self._check_success:
+        if last_check == self.check_success:
             self.logger.info("Check is skipped!")
             return
 
@@ -122,22 +125,22 @@ class PageContentChecker(WebCheckerBase):
         response = self.http_client.get_response_string(url)
         if not response:
             self.logger.error("%s: Failed to get response from %s", name, url)
-            self.log_request_status(requests_log, self._check_failed)
+            self.log_request_status(requests_log, self.check_failed)
             return
 
         response_content_bs = BeautifulSoup(response, "html.parser")
         html_node = response_content_bs.select_one(self.config[ConfigKeys.CSS_SELECTOR])
-        if self._is_content_updated(str(html_node)):
+        is_content_updated = self._is_content_updated(str(html_node))
+        self.log_request_status(requests_log, int(is_content_updated))
+        self._write_page_content(str(html_node))
+        if is_content_updated:
             self.logger.info("Content updated. Saving content...")
-            self._write_page_content(str(html_node))
-            self.log_request_status(requests_log, self._check_success)
-            subject = f"{name}: content updated!"
-            body = f"Content of {name} at {url} has been updated."
-            message = EmailMessage(subject=subject, body=body)
-            self.email_client.send_email(message)
+            self.log_request_status(requests_log, self.check_success)
+            self.send_email(
+                subject=f"{name}: content updated!",
+                body=f"Content of {name} at {url} has been updated.")
         else:
-            self.logger.info("Content not updated")
-            self.log_request_status(requests_log, self._check_failed)
+            self.logger.info("Content not updated.")
 
     def _write_page_content(self, page_content: str) -> None:
         file_path = os.path.join(self._content_dir_path, f"{datetime.now().isoformat()}.html")
@@ -148,12 +151,12 @@ class PageContentChecker(WebCheckerBase):
     def _is_content_updated(self, content: str) -> bool:
         saved_content = self._list_content_dir()
         if not saved_content:
-            return True
+            return False
 
         latest_content_file_path = saved_content[0]
         latest_saved_content_path = os.path.join(self._content_dir_path, latest_content_file_path)
         with open(latest_saved_content_path, "r", encoding=self._content_encoding) as file:
-            return hash_equals(content.encode(), file.read().encode())
+            return not hash_equals(content.encode(), file.read().encode())
 
     def _list_content_dir(self) -> list[str]:
         return sorted(os.listdir(self._content_dir_path), reverse=True)

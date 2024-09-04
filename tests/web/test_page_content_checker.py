@@ -32,5 +32,16 @@ def test_page_content_checker_detect_content_changed(page_content_checker):
     page_content_checker.check()
 
     request_log_path = page_content_checker.config[ConfigKeys.DIR] / page_content_checker._request_log_filename
-    assert page_content_checker.get_last_request_status(request_log_path) == 0
+    assert page_content_checker.get_last_request_status(request_log_path) == int(True)
     page_content_checker.email_client.send_email.assert_called_once()
+
+
+def test_page_content_checker_ignore_on_no_change(page_content_checker):
+    page_content_checker.check()
+
+    # Content not changed since last check
+    page_content_checker.check()
+
+    request_log_path = page_content_checker.config[ConfigKeys.DIR] / page_content_checker._request_log_filename
+    assert page_content_checker.get_last_request_status(request_log_path) == int(False)
+    page_content_checker.email_client.send_email.assert_not_called()
