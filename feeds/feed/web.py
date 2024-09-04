@@ -95,6 +95,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
 class PageContentChecker(WebCheckerBase):
     check_success: ClassVar[int] = 1
     check_failed: ClassVar[int] = 0
+    saved_content_count: ClassVar[int] = 50
     _content_encoding: ClassVar[str] = "utf-8"
 
     def __init__(self, email_client: EmailClient, http_client: HTTPClientBase, config: dict):
@@ -141,6 +142,7 @@ class PageContentChecker(WebCheckerBase):
                 body=f"Content of {name} at {url} has been updated.")
         else:
             self.logger.info("Content not updated.")
+        self._clean_up_content_dir()
 
     def _write_page_content(self, page_content: str) -> None:
         file_path = os.path.join(self._content_dir_path, f"{datetime.now().isoformat()}.html")
@@ -160,3 +162,11 @@ class PageContentChecker(WebCheckerBase):
 
     def _list_content_dir(self) -> list[str]:
         return sorted(os.listdir(self._content_dir_path), reverse=True)
+
+    def _clean_up_content_dir(self) -> None:
+        saved_content = self._list_content_dir()
+        if len(saved_content) > self.saved_content_count:
+            for file in saved_content[self.saved_content_count:]:
+                file_path = os.path.join(self._content_dir_path, file)
+                logger.debug("Removing file %s...", file_path)
+                os.remove(file_path)

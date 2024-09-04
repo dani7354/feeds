@@ -7,7 +7,7 @@ from feeds.feed.web import PageContentChecker, ConfigKeys
 from feeds.http.client import HTTPClientBase
 
 
-def _get_html_content(text: str):
+def _get_html_content(text: str) -> str:
     return f"<html><body><div class='content'>{text}</div></body></html>"
 
 
