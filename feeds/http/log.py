@@ -8,10 +8,11 @@ class RequestLogService:
     _log_encoding: str = "utf-8"
     _cell_delimiter: str = ";"
 
-    def __init__(self, request_log_dir: str):
+    def __init__(self, request_log_dir: str) -> None:
         self._request_log_dir = request_log_dir
         self._logger = logging.getLogger("RequestLogService")
         self.request_log = None
+        self._rotate_log_file_if_needed()
 
     def log_request(self, *values) -> None:
         self._rotate_log_file_if_needed()
@@ -22,7 +23,7 @@ class RequestLogService:
             file.write(record)
 
     def get_last_request_value(self, value_index: int = 0) -> str | None:
-        if not os.path.exists(self.request_log):
+        if not self.request_log or not os.path.exists(self.request_log):
             self._logger.warning("Request log %s doesn't exist!", self.request_log)
             return None
 
@@ -33,7 +34,7 @@ class RequestLogService:
 
     def _rotate_log_file_if_needed(self) -> None:
         date_str = datetime.now().strftime("%Y-%m")
-        if date_str in os.path.basename(self.request_log):
+        if self.request_log and date_str in os.path.basename(self.request_log):
             return
 
         new_log_filename = os.path.join(self._request_log_dir, f"{self._request_log_base_filename}_{date_str}.log")
