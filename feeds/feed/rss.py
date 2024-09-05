@@ -3,21 +3,14 @@ import os
 import xml.etree.ElementTree as ET
 from collections.abc import Sequence
 from datetime import datetime
-from enum import StrEnum
 from typing import NamedTuple, ClassVar
 
 from feeds.email.client import EmailClient, EmailMessage
 from feeds.email.html import create_table, create_heading_two, create_link
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.http.client import HTTPClientBase
+from feeds.shared.config import ConfigKeys
 from feeds.shared.helper import hash_equals
-
-
-class ConfigKeys(StrEnum):
-    URL = "url"
-    DIR = "data_dir"
-    SAVED_FEEDS_COUNT = "saved_feeds_count"
-    NAME = "name"
 
 
 class RssItem(NamedTuple):

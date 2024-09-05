@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from enum import StrEnum
 from typing import ClassVar
 from venv import logger
 
@@ -11,15 +10,8 @@ from feeds.email.client import EmailClient, EmailMessage
 from feeds.feed.base import FeedChecker
 from feeds.http.client import HTTPClientBase
 from feeds.http.log import RequestLogService
+from feeds.shared.config import ConfigKeys
 from feeds.shared.helper import hash_equals
-
-
-class ConfigKeys(StrEnum):
-    URL = "url"
-    DIR = "data_dir"
-    NAME = "name"
-    EXPECTED_STATUS_CODE = "expected_status_code"
-    CSS_SELECTOR = "css_selector"
 
 
 class WebCheckerBase(FeedChecker):

@@ -3,9 +3,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from feeds.email.client import EmailClient
-from feeds.feed.web import ConfigKeys, UrlAvailabilityChecker
+from feeds.feed.web import UrlAvailabilityChecker
 from feeds.http.client import HTTPClientBase
 from feeds.http.log import RequestLogService
+from feeds.shared.config import ConfigKeys
 
 
 @pytest.fixture

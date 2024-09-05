@@ -6,6 +6,8 @@ from feeds.feed.base import FeedChecker
 from feeds.feed.rss import RSSFeedChecker
 from feeds.feed.web import UrlAvailabilityChecker, PageContentChecker
 from feeds.http.client import HTTPClientBase
+from feeds.http.log import RequestLogService
+from feeds.shared.config import ConfigKeys
 
 
 class FeedFactoryError(Exception):
@@ -31,12 +33,13 @@ def create_feed_checkers(
             )
         elif feed_type == FeedType.WEB_AVAILABILITY:
             feed_checkers.extend(
-                UrlAvailabilityChecker(email_client, http_client, feed)
+                UrlAvailabilityChecker(email_client, http_client, RequestLogService(feed[ConfigKeys.DIR]), feed)
                 for feed in feeds
             )
         elif feed_type == FeedType.WEB_CONTENT:
             feed_checkers.extend(
-                PageContentChecker(email_client, http_client, feed) for feed in feeds
+                PageContentChecker(email_client, http_client, RequestLogService(feed[ConfigKeys.DIR]), feed) for feed in
+                feeds
             )
         else:
             raise FeedFactoryError(f"Unknown feed type: {feed_type}")

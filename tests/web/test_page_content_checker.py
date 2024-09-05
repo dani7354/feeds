@@ -3,9 +3,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from feeds.email.client import EmailClient
-from feeds.feed.web import PageContentChecker, ConfigKeys
+from feeds.feed.web import PageContentChecker
 from feeds.http.client import HTTPClientBase
 from feeds.http.log import RequestLogService
+from feeds.shared.config import ConfigKeys
 
 
 def _get_html_content(text: str) -> str:
