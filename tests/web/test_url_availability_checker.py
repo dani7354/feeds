@@ -29,7 +29,7 @@ def test_url_availability_checker_do_nothing_on_service_down(url_availability_ch
     url_availability_checker.http_client.get_response_code.return_value = 500
     url_availability_checker.check()
 
-    assert int(url_availability_checker.request_log_service.get_last_request_value(1)) == 500
+    assert int(url_availability_checker.request_log_service.get_last_request_value(value_index=1)) == 500
     url_availability_checker.email_client.send_email.assert_not_called()
 
 
@@ -37,5 +37,5 @@ def test_url_availability_checker_send_email_on_service_up(url_availability_chec
     url_availability_checker.http_client.get_response_code.return_value = 200
     url_availability_checker.check()
 
-    assert int(url_availability_checker.request_log_service.get_last_request_value(1)) == 200
+    assert int(url_availability_checker.request_log_service.get_last_request_value(value_index=1)) == 200
     url_availability_checker.email_client.send_email.assert_called_once()
