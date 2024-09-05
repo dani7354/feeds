@@ -128,7 +128,7 @@ class PageContentChecker(WebCheckerBase):
         self._clean_up_content_dir()
 
     def _write_page_content(self, page_content: str) -> None:
-        file_path = os.path.join(self._content_dir_path, f"page_content{time.time_ns()}.html")
+        file_path = os.path.join(self._content_dir_path, f"page_content_{time.time_ns()}.html")
         with open(file_path, "w", encoding=self._content_encoding) as file:
             logger.debug("Writing page content to file %s...", file_path)
             file.write(page_content)
