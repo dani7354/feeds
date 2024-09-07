@@ -52,12 +52,12 @@ class UrlAvailabilityChecker(WebCheckerBase):
         super().__init__(http_client, email_client, request_log_service, config)
         self.logger = logging.getLogger("UrlAvailabilityChecker")
         self.expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
+        self.data_dir = self.config[ConfigKeys.DIR]
 
     def check(self) -> None:
-        data_dir = self.config[ConfigKeys.DIR]
-        if not os.path.exists(data_dir):
-            logger.info("Creating directory %s...", data_dir)
-            os.makedirs(data_dir)
+        if not os.path.exists(self.data_dir):
+            logger.info("Creating directory %s...", self.data_dir)
+            os.makedirs(self.data_dir)
         last_status_code = self.request_log_service.get_last_request_value(value_index=1)
         logger.debug("Last status code: %s", last_status_code)
         if last_status_code and int(last_status_code) == self.expected_status_code:
@@ -135,8 +135,7 @@ class PageContentChecker(WebCheckerBase):
             file.write(page_content)
 
     def _is_content_updated(self, content: str) -> bool:
-        saved_content = self._list_content_dir()
-        if not saved_content:
+        if not (saved_content := self._list_content_dir()):
             return False
 
         latest_content_file_path = saved_content[0]
