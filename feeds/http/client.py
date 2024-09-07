@@ -78,4 +78,4 @@ class HTTPClientDynamic(HTTPClientDynamicBase):
             )
             content_html_element = driver.find_element(By.CSS_SELECTOR, css_selector_content)
 
-            return content_html_element.text
+            return content_html_element.get_attribute("outerHTML")

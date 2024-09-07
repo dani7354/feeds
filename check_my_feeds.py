@@ -12,7 +12,7 @@ from feeds.email.client import StandardSMTP, Configuration, EmailClient
 from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
-from feeds.http.client import HTTPClientBase, HTTPClient
+from feeds.http.client import HTTPClientBase, HTTPClient, HTTPClientDynamicBase, HTTPClientDynamic
 from feeds.settings import CONFIG_PATH
 
 
@@ -24,9 +24,11 @@ class CheckMyFeedsJob:
     def get_feed_checkers(self) -> list[FeedChecker]:
         email_client = self._get_email_client()
         http_client = self._get_http_client()
+        http_client_dynamic = self._get_http_client_dynamic()
         feed_checkers = create_feed_checkers(
             email_client=email_client,
             http_client=http_client,
+            http_client_dynamic=http_client_dynamic,
             feeds_by_type=self.config["feeds_by_type"],
         )
 
@@ -60,6 +62,10 @@ class CheckMyFeedsJob:
     @staticmethod
     def _get_http_client() -> HTTPClientBase:
         return HTTPClient({})
+
+    @staticmethod
+    def _get_http_client_dynamic() -> HTTPClientDynamicBase:
+        return HTTPClientDynamic({})
 
     def run(self) -> None:
         for feed_checker in self.get_feed_checkers():
