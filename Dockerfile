@@ -9,8 +9,7 @@ RUN apt update -y \
     && update-ca-certificates
 
 # Cleanup unnecessary stuff
-RUN apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -rf /var/lib/apt/lists/* /tmp/*
+RUN apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
 ENV VENV_PATH=/opt/venv
 RUN python3 -m venv "$VENV_PATH"
