@@ -1,5 +1,17 @@
 FROM python:3.12-slim-bookworm
 
+#RUN apt-get update && apt-get install -y wget bzip2 libxtst6 libgtk-3-0 libx11-xcb-dev libdbus-glib-1-2 libxt6 libpci-dev && rm -rf /var/lib/apt/lists/*
+
+# Install Firefox dependencies
+RUN apt update -y \
+    && apt install --no-install-recommends --no-install-suggests -y tzdata ca-certificates bzip2 curl wget libc-dev libxt6 \
+    && apt install --no-install-recommends --no-install-suggests -y `apt-cache depends firefox-esr | awk '/Depends:/{print$2}'` \
+    && update-ca-certificates
+
+# Cleanup unnecessary stuff
+RUN apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/* /tmp/*
+
 ENV VENV_PATH=/opt/venv
 RUN python3 -m venv "$VENV_PATH"
 ENV PATH="$VENV_PATH/bin:$PATH"
