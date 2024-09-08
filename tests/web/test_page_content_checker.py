@@ -34,7 +34,7 @@ def page_content_checker(tmp_path):
 def test_page_content_checker_detect_content_changed(page_content_checker):
     page_content_checker.check()
 
-    page_content_checker.http_client.get_response_string.return_value = _get_html_content("Changed content")
+    page_content_checker._http_client.get_response_string.return_value = _get_html_content("Changed content")
     page_content_checker.check()
 
     assert int(page_content_checker.request_log_service.get_last_request_value(value_index=1)) == int(True)
