@@ -1,11 +1,11 @@
 FROM python:3.12-slim-bookworm
 
-#RUN apt-get update && apt-get install -y wget bzip2 libxtst6 libgtk-3-0 libx11-xcb-dev libdbus-glib-1-2 libxt6 libpci-dev && rm -rf /var/lib/apt/lists/*
-
-# Install Firefox dependencies
+# Install Firefox dependencies. Needed for selenium
 RUN apt update -y \
-    && apt install --no-install-recommends --no-install-suggests -y tzdata ca-certificates bzip2 curl wget libc-dev libxt6 \
-    && apt install --no-install-recommends --no-install-suggests -y `apt-cache depends firefox-esr | awk '/Depends:/{print$2}'` \
+    && apt install --no-install-recommends --no-install-suggests -y \
+    tzdata ca-certificates bzip2 curl wget libc-dev libxt6 \
+    && apt install --no-install-recommends --no-install-suggests -y  \
+    `apt-cache depends firefox-esr | awk '/Depends:/{print$2}'` \
     && update-ca-certificates
 
 # Cleanup unnecessary stuff
