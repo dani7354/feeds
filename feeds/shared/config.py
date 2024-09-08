@@ -7,4 +7,6 @@ class ConfigKeys(StrEnum):
     NAME = "name"
     EXPECTED_STATUS_CODE = "expected_status_code"
     CSS_SELECTOR = "css_selector"
+    CSS_SELECTOR_LOADED = "css_selector_loaded"
+    CSS_SELECTOR_CONTENT = "css_selector_content"
     SAVED_FEEDS_COUNT = "saved_feeds_count"
