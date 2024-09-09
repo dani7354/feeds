@@ -68,13 +68,16 @@ class CheckMyFeedsJob:
         return HTTPClientDynamic({})
 
     def run(self) -> None:
-        for feed_checker in self.get_feed_checkers():
-            self.logger.info("Running feed checker %s...", feed_checker.name)
-            feed_checker.check()
-            self.logger.info("Finished running %s.", feed_checker.name)
+        try:
+            for feed_checker in self.get_feed_checkers():
+                self.logger.info("Running feed checker %s...", feed_checker.name)
+                feed_checker.check()
+                self.logger.info("Finished running %s.", feed_checker.name)
 
-            self.logger.debug("Setting up scheduling for feed %s...", feed_checker.name)
-            self._schedule_check(feed_checker)
+                self.logger.debug("Setting up scheduling for feed %s...", feed_checker.name)
+                self._schedule_check(feed_checker)
+        except FeedCheckFailedError as ex:
+            self.logger.error("Error running scheduled jobs: %s", ex)
 
         self.logger.info("Feed checkers set up successfully! Running scheduled jobs...")
         while True:
