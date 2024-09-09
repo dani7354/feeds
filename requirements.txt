@@ -2,4 +2,4 @@ requests
 schedule
 beautifulsoup4
 selenium
-slugify
+python-slugify
