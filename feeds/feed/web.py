@@ -116,7 +116,7 @@ class PageContentChecker(WebCheckerBase):
             html_node = response_content_bs.select_one(self.css_selector)
             is_content_updated = self._is_content_updated(str(html_node))
             self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(html_node.encode(encoding=self._content_encoding))
+            self.content_file_service.save_content(str(html_node).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
                 self.request_log_service.log_request(self.check_success)
@@ -173,7 +173,7 @@ class PageContentCheckerDynamic(WebCheckerBase):
 
             is_content_updated = self._is_content_updated(str(response))
             self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(response.encode(encoding=self._content_encoding))
+            self.content_file_service.save_content(str(response).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
                 self.request_log_service.log_request(self.check_success)
