@@ -50,7 +50,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
             config: dict) -> None:
         super().__init__(email_client, request_log_service, config)
         self._http_client = http_client
-        self.logger = logging.getLogger("UrlAvailabilityChecker")
+        self._logger = logging.getLogger("UrlAvailabilityChecker")
         self.expected_status_code = self.config[ConfigKeys.EXPECTED_STATUS_CODE]
         self.data_dir = self.config[ConfigKeys.DIR]
 
@@ -62,7 +62,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
             last_status_code = self.request_log_service.get_last_request_value(value_index=1)
             logger.debug("Last status code: %s", last_status_code)
             if last_status_code and int(last_status_code) == self.expected_status_code:
-                self.logger.info(
+                self._logger.info(
                     "Service is available (status code %s). Check is skipped!",
                     last_status_code,
                 )
@@ -76,6 +76,7 @@ class UrlAvailabilityChecker(WebCheckerBase):
                     subject=f"Web service {self.name} returns status code {status_code}",
                     body=f"Web service at {self.url} is returning status code {status_code}")
         except Exception as ex:
+            self._logger.error(ex)
             raise FeedCheckFailedError from ex
 
 
@@ -126,6 +127,7 @@ class PageContentChecker(WebCheckerBase):
                 self._logger.info("Content not updated.")
             self.content_file_service.clean_up_content_dir()
         except Exception as ex:
+            self._logger.error(ex)
             raise FeedCheckFailedError from ex
 
     def _is_content_updated(self, content: str) -> bool:
@@ -148,7 +150,7 @@ class PageContentCheckerDynamic(WebCheckerBase):
             request_log_service: RequestLogService,
             config: dict):
         super().__init__(email_client, request_log_service, config)
-        self._logger = logging.getLogger("PageContentChecker")
+        self._logger = logging.getLogger("PageContentCheckerDynamic")
         self._http_client = http_client
         self.content_file_service = HtmlContentFileService(
             os.path.join(self.config[ConfigKeys.DIR], "content"), slugify(self.name))
@@ -182,6 +184,7 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 self._logger.info("Content not updated.")
             self.content_file_service.clean_up_content_dir()
         except Exception as ex:
+            self._logger.error(ex)
             raise FeedCheckFailedError from ex
 
     def _is_content_updated(self, content: str) -> bool:
