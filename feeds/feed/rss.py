@@ -42,8 +42,7 @@ class RSSFeedChecker(FeedChecker):
             if not os.path.exists(self.data_dir_path):
                 os.mkdir(self.data_dir_path)
 
-            feed = self._http_client.get_response_string(self.url)
-            if not feed:
+            if not (feed := self._http_client.get_response_string(self.url)):
                 raise FeedCheckFailedError(f"Failed to download feed at {self.url}")
 
             rss_tree = ET.ElementTree(ET.fromstring(feed))
@@ -71,8 +70,7 @@ class RSSFeedChecker(FeedChecker):
         return rss_items
 
     def _feed_content_updated(self, new_feed_tree: ET.ElementTree) -> bool:
-        saved_feeds = self._list_data_dir(descending=True)
-        if not saved_feeds:
+        if not (saved_feeds := self._list_data_dir(descending=True)):
             return True
 
         latest_feed = saved_feeds[0]
@@ -87,9 +85,7 @@ class RSSFeedChecker(FeedChecker):
             ET.tostring(x) for x in new_feed_tree.findall(self._channel_items_path)
         )
         if not channel_new_feed_bytes or not channel_old_feed_bytes:
-            raise FeedCheckFailedError(
-                "Failed to find RSS feed items. Check if the RSS feed is alright."
-            )
+            raise FeedCheckFailedError("Failed to find RSS feed items. Check if the RSS feed is alright.")
 
         return not hash_equals(channel_old_feed_bytes, channel_new_feed_bytes)
 

@@ -32,6 +32,7 @@ class EmailClient:
 
 
 class StandardSMTP(EmailClient):
+    encoding = "utf-8"
 
     def send_email(self, email: EmailMessage) -> None:
         mime_message = self._create_message_str(email)
@@ -46,8 +47,8 @@ class StandardSMTP(EmailClient):
             mail_server.send_message(mime_message)
 
     def _create_message_str(self, message: EmailMessage) -> MIMEText:
-        mime_text_message = MIMEText(message.body, "html", "utf-8")
-        mime_text_message["Subject"] = Header(message.subject, "utf-8")
+        mime_text_message = MIMEText(message.body, "html", self.encoding)
+        mime_text_message["Subject"] = Header(message.subject, self.encoding)
         mime_text_message["From"] = self.configuration.sender
         mime_text_message["To"] = self.configuration.recipients[0]
 

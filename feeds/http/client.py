@@ -1,5 +1,4 @@
 import requests
-from requests import Response
 from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
@@ -42,21 +41,11 @@ class HTTPClient(HTTPClientBase):
         if response.status_code != 200:
             return ""
 
-        return self._decode_response(response)
+        return response.content.decode(encoding="utf-8", errors='ignore')
 
     def get_response_code(self, url: str) -> int:
         response = requests.get(url, headers=self._headers, timeout=self._timeout_seconds)
         return response.status_code
-
-    @staticmethod
-    def _decode_response(response: Response) -> str:
-        try:
-            return response.content.decode(encoding="utf-8")
-        except UnicodeDecodeError:
-            content_type_header_value = response.headers.get("Content-Type")
-            if "ISO-8859-1" in content_type_header_value:
-                return response.content.decode(encoding="latin-1")
-            raise
 
 
 class HTTPClientDynamic(HTTPClientDynamicBase):
