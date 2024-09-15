@@ -1,9 +1,10 @@
 import asyncio
 import logging
 
-from feeds.email.client import EmailClient
+from feeds.email.client import EmailClient, EmailMessage
+from feeds.email.html import create_paragraph
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
-from feeds.service.portscan import HostScanService
+from feeds.service.host_scan import HostScanService
 from feeds.shared.config import ConfigKeys
 
 
@@ -15,18 +16,33 @@ class HostAvailabilityCheck(FeedChecker):
         self._email_client = email_client
         self._logger = logging.getLogger("HostCheck")
         self.host = self.config[ConfigKeys.HOST]
-        self.expected_open_port = self.config[ConfigKeys.EXPECTED_OPEN_PORTS]
+        self.expected_open_ports = set(self.config[ConfigKeys.EXPECTED_OPEN_PORTS])
 
     def check(self) -> None:
         try:
-            result = asyncio.run(self._host_scan_service.scan_host_tcp_ports(self.host))
-            expected_ports_are_open = all(port in result.open_tcp_ports for port in self.expected_open_port)
-            if not expected_ports_are_open:
-                self._logger.error(
-                    "Host %s does not have all expected ports open. Expected: %s, Open: %s",
+            port_scan_result = asyncio.run(self._host_scan_service.scan_host_tcp_ports(self.host))
+            open_ports = set(port_scan_result.open_tcp_ports)
+
+            if open_ports == self.expected_open_ports:
+                self._logger.info(
+                    "Host %s has all expected ports open: %s",
                     self.host,
-                    self.expected_open_port,
-                    result.open_tcp_ports)
+                    ",".join(self.expected_open_ports))
+                return
+
+            message_subject = f"Host availability check {self.name}: Unexpected scan results"
+            message_str = ""
+            missing_open_ports = self.expected_open_ports - open_ports
+            if missing_open_ports:
+                self._logger.info("Host %s is missing expected TCP ports: %s", self.host, missing_open_ports)
+                message_str += create_paragraph(f"{self.host} Missing open TCP ports: {missing_open_ports}")
+
+            unexpected_open_ports = open_ports - self.expected_open_ports
+            if unexpected_open_ports:
+                self._logger.info("Host %s has unexpected open TCP ports: %s", self.host, unexpected_open_ports)
+                message_str += create_paragraph(f"{self.host}: Unexpected open TCP ports: {unexpected_open_ports}")
+
+            self._email_client.send_email(EmailMessage(subject=message_subject, body=message_str))
         except Exception as ex:
             raise FeedCheckFailedError(
                 f"Error checking host {self.host}: {ex}"

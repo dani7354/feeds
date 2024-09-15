@@ -8,7 +8,7 @@ from feeds.feed.rss import RSSFeedChecker
 from feeds.feed.web import UrlAvailabilityChecker, PageContentChecker, PageContentCheckerDynamic
 from feeds.http.client import HTTPClientBase, HTTPClientDynamicBase
 from feeds.http.log import RequestLogService
-from feeds.service.portscan import HostScanService
+from feeds.service.host_scan import HostScanService
 from feeds.shared.config import ConfigKeys
 
 

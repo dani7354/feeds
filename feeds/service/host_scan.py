@@ -8,10 +8,6 @@ from tempfile import TemporaryDirectory
 from slugify import slugify
 
 
-class PortScanFailedError(Exception):
-    pass
-
-
 @dataclasses.dataclass
 class HostScanResult:
     host: str
