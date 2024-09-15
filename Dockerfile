@@ -8,6 +8,9 @@ RUN apt update -y \
     `apt-cache depends firefox-esr | awk '/Depends:/{print$2}'` \
     && update-ca-certificates
 
+# Install nmap (required for host availability check)
+RUN apt install nmap -y
+
 # Cleanup unnecessary stuff
 RUN apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 

@@ -32,7 +32,11 @@ class NmapScanService(HostScanService):
             temp_scan_result_file = os.path.join(temp_dir, f"nmap_scan_result_{slugify(host)}{time.time_ns()}.xml")
             cmd = self._cmd.format(host=host, xml_file=temp_scan_result_file)
             self._logger.info(f"Scanning host %s. Result will be saved to %s.", host, temp_scan_result_file)
-            os.system(cmd)
+            exit_code = os.system(cmd)
+            if exit_code != 0:
+                raise RuntimeError(
+                    f"Failed to scan host {host} with nmap. Maybe nmap is missing Exit code: {exit_code}")
+
             self._logger.info("Scan finished")
             scan_result = await self._parse_scan_result(temp_scan_result_file, host)
             self._logger.info("Scan finished in %s seconds", time.perf_counter() - time_start)

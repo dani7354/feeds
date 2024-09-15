@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from feeds.email.client import EmailClient, EmailMessage
-from feeds.email.html import create_paragraph
+from feeds.email.html import create_paragraph, create_heading_two
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.service.host_scan import HostScanService
 from feeds.shared.config import ConfigKeys
@@ -31,11 +31,11 @@ class HostAvailabilityCheck(FeedChecker):
                 return
 
             message_subject = f"Host availability check {self.name}: Unexpected scan results"
-            message_str = ""
+            message_str = create_heading_two(f"Unexpected scan results for host {self.name}")
             missing_open_ports = self.expected_open_ports - open_ports
             if missing_open_ports:
                 self._logger.info("Host %s is missing expected TCP ports: %s", self.host, missing_open_ports)
-                message_str += create_paragraph(f"{self.host} Missing open TCP ports: {missing_open_ports}")
+                message_str += create_paragraph(f"{self.host}: Missing open TCP ports: {missing_open_ports}")
 
             unexpected_open_ports = open_ports - self.expected_open_ports
             if unexpected_open_ports:
