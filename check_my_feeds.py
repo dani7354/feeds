@@ -13,6 +13,7 @@ from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
 from feeds.http.client import HTTPClientBase, HTTPClient, HTTPClientDynamicBase, HTTPClientDynamic
+from feeds.service.portscan import NmapScanService
 from feeds.settings import CONFIG_PATH
 
 
@@ -30,6 +31,7 @@ class CheckMyFeedsJob:
             http_client=http_client,
             http_client_dynamic=http_client_dynamic,
             feeds_by_type=self.config["feeds_by_type"],
+            host_scan_service=NmapScanService(),
         )
 
         return feed_checkers

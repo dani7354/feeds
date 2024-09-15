@@ -44,7 +44,7 @@ class StandardSMTP(EmailClient):
             mail_server.login(
                 self.configuration.smtp_user, self.configuration.smtp_password
             )
-            mail_server.send_message(mime_message)
+            # mail_server.send_message(mime_message)
 
     def _create_message_str(self, message: EmailMessage) -> MIMEText:
         mime_text_message = MIMEText(message.body, "html", self.encoding)

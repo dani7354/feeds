@@ -119,7 +119,6 @@ class PageContentChecker(WebCheckerBase):
             self.content_file_service.save_content(str(html_node).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
-                self.request_log_service.log_request(self.check_success)
                 self.send_email(
                     subject=f"{self.name}: content updated!",
                     body=f"Content of {self.name} at {self.url} has been updated.")
@@ -176,7 +175,6 @@ class PageContentCheckerDynamic(WebCheckerBase):
             self.content_file_service.save_content(str(response).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
-                self.request_log_service.log_request(self.check_success)
                 self.send_email(
                     subject=f"{self.name}: content updated!",
                     body=f"Content of {self.name} at {self.url} has been updated.")
