@@ -67,5 +67,15 @@ class HostAvailabilityCheck(FeedChecker):
 
             self._email_client.send_email(EmailMessage(subject=message_subject, body=message_str))
         except Exception as ex:
-            self._logger.error("Error checking host %s: %s", self.host, ex)
+            self._log_error_and_send_email(ex)
             raise FeedCheckFailedError(f"Error checking host {self.host}: {ex}") from ex
+
+    def _log_error_and_send_email(self, ex: Exception) -> None:
+        self._logger.error(ex)
+        message_body = f"{create_heading_two(f"Error checking host {self.host}")}\n{create_paragraph(str(ex))}"
+        self._email_client.send_email(
+            EmailMessage(
+                subject=f"Host availability check {self.name}: Error checking host {self.host}",
+                body=message_body,
+            )
+        )
