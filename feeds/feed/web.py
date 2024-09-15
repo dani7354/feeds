@@ -22,7 +22,8 @@ class WebCheckerBase(FeedChecker):
             self,
             email_client: EmailClient,
             request_log_service: RequestLogService,
-            config: dict) -> None:
+            config: dict,
+    ) -> None:
         super().__init__(config)
         self.email_client = email_client
         self.request_log_service = request_log_service
@@ -47,7 +48,8 @@ class UrlAvailabilityChecker(WebCheckerBase):
             email_client: EmailClient,
             http_client: HTTPClientBase,
             request_log_service: RequestLogService,
-            config: dict) -> None:
+            config: dict,
+    ) -> None:
         super().__init__(email_client, request_log_service, config)
         self._http_client = http_client
         self._logger = logging.getLogger("UrlAvailabilityChecker")
@@ -74,7 +76,8 @@ class UrlAvailabilityChecker(WebCheckerBase):
             if status_code == self.expected_status_code:
                 self.send_email(
                     subject=f"Web service {self.name} returns status code {status_code}",
-                    body=f"Web service at {self.url} is returning status code {status_code}")
+                    body=f"Web service at {self.url} is returning status code {status_code}",
+                )
         except Exception as ex:
             self._logger.error(ex)
             raise FeedCheckFailedError from ex
@@ -91,12 +94,14 @@ class PageContentChecker(WebCheckerBase):
             email_client: EmailClient,
             http_client: HTTPClientBase,
             request_log_service: RequestLogService,
-            config: dict):
+            config: dict,
+    ):
         super().__init__(email_client, request_log_service, config)
         self._logger = logging.getLogger("PageContentChecker")
         self._http_client = http_client
         self.content_file_service = HtmlContentFileService(
-            os.path.join(self.config[ConfigKeys.DIR], "content"), slugify(self.name))
+            os.path.join(self.config[ConfigKeys.DIR], "content"), slugify(self.name)
+        )
         self.css_selector = self.config[ConfigKeys.CSS_SELECTOR]
 
     def check(self) -> None:
@@ -119,10 +124,10 @@ class PageContentChecker(WebCheckerBase):
             self.content_file_service.save_content(str(html_node).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
-                self.request_log_service.log_request(self.check_success)
                 self.send_email(
                     subject=f"{self.name}: content updated!",
-                    body=f"Content of {self.name} at {self.url} has been updated.")
+                    body=f"Content of {self.name} at {self.url} has been updated.",
+                )
             else:
                 self._logger.info("Content not updated.")
             self.content_file_service.clean_up_content_dir()
@@ -148,12 +153,14 @@ class PageContentCheckerDynamic(WebCheckerBase):
             email_client: EmailClient,
             http_client: HTTPClientDynamicBase,
             request_log_service: RequestLogService,
-            config: dict):
+            config: dict,
+    ):
         super().__init__(email_client, request_log_service, config)
         self._logger = logging.getLogger("PageContentCheckerDynamic")
         self._http_client = http_client
         self.content_file_service = HtmlContentFileService(
-            os.path.join(self.config[ConfigKeys.DIR], "content"), slugify(self.name))
+            os.path.join(self.config[ConfigKeys.DIR], "content"), slugify(self.name)
+        )
         self.css_selector_loaded = self.config[ConfigKeys.CSS_SELECTOR_LOADED]
         self.css_selector_content = self.config[ConfigKeys.CSS_SELECTOR_CONTENT]
 
@@ -165,8 +172,11 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 return
 
             logger.debug("Checking content of web service at %s...", self.url)
-            if not (response := self._http_client.get_content_by_css_selector(
-                    self.url, self.css_selector_loaded, self.css_selector_content)):
+            if not (
+                    response := self._http_client.get_content_by_css_selector(
+                        self.url, self.css_selector_loaded, self.css_selector_content
+                    )
+            ):
                 self._logger.error("%s: Failed to get response from %s", self.name, self.url)
                 self.request_log_service.log_request(self.check_failed)
                 return
@@ -176,10 +186,10 @@ class PageContentCheckerDynamic(WebCheckerBase):
             self.content_file_service.save_content(str(response).encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
-                self.request_log_service.log_request(self.check_success)
                 self.send_email(
                     subject=f"{self.name}: content updated!",
-                    body=f"Content of {self.name} at {self.url} has been updated.")
+                    body=f"Content of {self.name} at {self.url} has been updated.",
+                )
             else:
                 self._logger.info("Content not updated.")
             self.content_file_service.clean_up_content_dir()
