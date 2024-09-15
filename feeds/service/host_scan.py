@@ -26,7 +26,7 @@ class HostScanResult:
 class HostScanService:
     async def scan_host_tcp_ports(self, host: str) -> HostScanResult:
         """ Scan host for open and filtered TCP ports. """
-        pass
+        raise NotImplementedError
 
 
 class NmapScanService(HostScanService):
@@ -39,7 +39,7 @@ class NmapScanService(HostScanService):
         with TemporaryDirectory() as temp_dir:
             temp_scan_result_file = os.path.join(temp_dir, f"nmap_scan_result_{slugify(host)}_{time.time_ns()}.xml")
             cmd = self._cmd.format(host=host, xml_file=temp_scan_result_file)
-            self._logger.info(f"Scanning host %s. Result will be saved to %s.", host, temp_scan_result_file)
+            self._logger.info("Scanning host %s. Result will be saved to %s.", host, temp_scan_result_file)
             exit_code = os.system(cmd)
             if exit_code != 0:
                 raise RuntimeError(
@@ -52,7 +52,7 @@ class NmapScanService(HostScanService):
 
     async def _parse_scan_result(self, scan_result_file: str, host: str) -> list[HostScanResult]:
         self._logger.info("Parsing scan result from %s", scan_result_file)
-        with open(scan_result_file, "r") as f:
+        with open(scan_result_file, "r", encoding="utf-8") as f:
             result_xml = ET.parse(f)
             host_results = []
             for host_node in result_xml.findall(".//host"):
