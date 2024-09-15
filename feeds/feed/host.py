@@ -41,7 +41,7 @@ class HostAvailabilityCheck(FeedChecker):
                 self._logger.info(
                     "Host %s has all expected ports open: %s",
                     self.host,
-                    ",".join(self.expected_open_ports),
+                    self.expected_open_ports,
                 )
                 return
 
@@ -67,4 +67,5 @@ class HostAvailabilityCheck(FeedChecker):
 
             self._email_client.send_email(EmailMessage(subject=message_subject, body=message_str))
         except Exception as ex:
+            self._logger.error("Error checking host %s: %s", self.host, ex)
             raise FeedCheckFailedError(f"Error checking host {self.host}: {ex}") from ex
