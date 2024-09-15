@@ -26,7 +26,9 @@ def url_availability_checker(tmp_path) -> UrlAvailabilityChecker:
     return UrlAvailabilityChecker(email_client, http_client, request_log_service, config)
 
 
-def test_url_availability_checker_do_nothing_on_service_down(url_availability_checker) -> None:
+def test_url_availability_checker_do_nothing_on_service_down(
+        url_availability_checker,
+) -> None:
     url_availability_checker._http_client.get_response_code.return_value = 500
     url_availability_checker.check()
 
@@ -34,7 +36,9 @@ def test_url_availability_checker_do_nothing_on_service_down(url_availability_ch
     url_availability_checker.email_client.send_email.assert_not_called()
 
 
-def test_url_availability_checker_send_email_on_service_up(url_availability_checker) -> None:
+def test_url_availability_checker_send_email_on_service_up(
+        url_availability_checker,
+) -> None:
     url_availability_checker._http_client.get_response_code.return_value = 200
     url_availability_checker.check()
 

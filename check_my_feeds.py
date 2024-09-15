@@ -12,7 +12,12 @@ from feeds.email.client import StandardSMTP, Configuration, EmailClient
 from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
-from feeds.http.client import HTTPClientBase, HTTPClient, HTTPClientDynamicBase, HTTPClientDynamic
+from feeds.http.client import (
+    HTTPClientBase,
+    HTTPClient,
+    HTTPClientDynamicBase,
+    HTTPClientDynamic,
+)
 from feeds.service.host_scan import NmapScanService
 from feeds.settings import CONFIG_PATH
 

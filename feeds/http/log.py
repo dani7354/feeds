@@ -18,8 +18,10 @@ class RequestLogService:
         self._rotate_log_file_if_needed()
         with open(self.request_log, "a", encoding=self._log_encoding) as file:
             self._logger.debug("Writing to %s...", self.request_log)
-            record = (f"{datetime.now().isoformat()}{self._cell_delimiter}"
-                      f"{self._cell_delimiter.join(str(value) for value in values)}\n")
+            record = (
+                f"{datetime.now().isoformat()}{self._cell_delimiter}"
+                f"{self._cell_delimiter.join(str(value) for value in values)}\n"
+            )
             file.write(record)
 
     def get_last_request_value(self, value_index: int = 0) -> str | None:

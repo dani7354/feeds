@@ -17,11 +17,7 @@ class HTTPClientBase:
 
 
 class HTTPClientDynamicBase:
-    def get_content_by_css_selector(
-            self,
-            url: str,
-            css_selector_loaded: str,
-            css_selector_content: str) -> str:
+    def get_content_by_css_selector(self, url: str, css_selector_loaded: str, css_selector_content: str) -> str:
         """
         Should be overwritten by subclasses
         url: str: URL to get content from
@@ -41,7 +37,7 @@ class HTTPClient(HTTPClientBase):
         if response.status_code != 200:
             return ""
 
-        return response.content.decode(encoding="utf-8", errors='ignore')
+        return response.content.decode(encoding="utf-8", errors="ignore")
 
     def get_response_code(self, url: str) -> int:
         response = requests.get(url, headers=self._headers, timeout=self._timeout_seconds)
@@ -53,11 +49,7 @@ class HTTPClientDynamic(HTTPClientDynamicBase):
         self._headers = headers
         self._timeout_seconds = 10
 
-    def get_content_by_css_selector(
-            self,
-            url: str,
-            css_selector_loaded: str,
-            css_selector_content) -> str:
+    def get_content_by_css_selector(self, url: str, css_selector_loaded: str, css_selector_content) -> str:
         driver_options = Options()
         driver_options.add_argument("--headless")
         with Firefox(options=driver_options) as driver:
