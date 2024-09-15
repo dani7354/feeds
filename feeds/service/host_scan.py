@@ -32,7 +32,7 @@ class HostScanService:
 class NmapScanService(HostScanService):
     def __init__(self):
         self._logger = logging.getLogger("NmapScanService")
-        self._cmd = "nmap -vv -Pn -sT -p0-65535 {host} -oX {xml_file}"
+        self._cmd = "nmap -vv -Pn -sT -p0-65535 {host} -oX {xml_file} -T5"
 
     async def scan_host_tcp_ports(self, host: str) -> HostScanResult:
         time_start = time.perf_counter()

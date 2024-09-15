@@ -54,7 +54,6 @@ class RSSFeedChecker(FeedChecker):
     def _parse_feed_items(self, tree: ET.ElementTree) -> list[RssItem]:
         rss_items = []
         for item in tree.findall(self._channel_items_path):
-            self._logger.debug("Parsing item %s", ET.tostring(item))
             title = item.find(self._title_element).text
             link = item.find(self._link_element).text
             published_date = item.find(self._published_date_element).text
