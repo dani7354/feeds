@@ -4,7 +4,7 @@ import logging
 from feeds.email.client import EmailClient, EmailMessage
 from feeds.email.html import create_paragraph, create_heading_two
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
-from feeds.service.host_scan import HostScanService
+from feeds.service.host_scan import HostScanService, HostStatus
 from feeds.shared.config import ConfigKeys
 
 
@@ -21,8 +21,16 @@ class HostAvailabilityCheck(FeedChecker):
     def check(self) -> None:
         try:
             port_scan_result = asyncio.run(self._host_scan_service.scan_host_tcp_ports(self.host))
-            open_ports = set(port_scan_result.open_tcp_ports)
+            if port_scan_result.status == HostStatus.DOWN:
+                self._logger.info("Host %s is down", self.host)
+                self._email_client.send_email(
+                    EmailMessage(
+                        subject=f"Host availability check {self.name}: Host is down",
+                        body=create_heading_two(f"Host {self.host} is down"))
+                )
+                return
 
+            open_ports = set(port_scan_result.open_tcp_ports)
             if open_ports == self.expected_open_ports:
                 self._logger.info(
                     "Host %s has all expected ports open: %s",
