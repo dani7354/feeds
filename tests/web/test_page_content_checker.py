@@ -49,3 +49,19 @@ def test_page_content_checker_ignore_on_no_change(page_content_checker):
 
     assert int(page_content_checker.request_log_service.get_last_request_value(value_index=1)) == int(False)
     page_content_checker.email_client.send_email.assert_not_called()
+
+
+def test_page_content_checker_send_mail_on_each_change(page_content_checker):
+    page_content_checker.check()
+
+    # First time
+    page_content_checker._http_client.get_response_string.return_value = _get_html_content("Changed content")
+    page_content_checker.check()
+    assert int(page_content_checker.request_log_service.get_last_request_value(value_index=1)) == int(True)
+
+    # Second time
+    page_content_checker._http_client.get_response_string.return_value = _get_html_content("Changed content new")
+    page_content_checker.check()
+
+    assert int(page_content_checker.request_log_service.get_last_request_value(value_index=1)) == int(True)
+    assert page_content_checker.email_client.send_email.call_count == 2

@@ -106,11 +106,6 @@ class PageContentChecker(WebCheckerBase):
 
     def check(self) -> None:
         try:
-            last_check = self.request_log_service.get_last_request_value(value_index=1)
-            if last_check and int(last_check) == self.check_success:
-                self._logger.info("Check is skipped!")
-                return
-
             logger.debug("Checking content of web service at %s...", self.url)
             if not (response := self._http_client.get_response_string(self.url)):
                 self._logger.error("%s: Failed to get response from %s", self.name, self.url)
@@ -166,11 +161,6 @@ class PageContentCheckerDynamic(WebCheckerBase):
 
     def check(self) -> None:
         try:
-            last_check = self.request_log_service.get_last_request_value(value_index=1)
-            if last_check and int(last_check) == self.check_success:
-                self._logger.info("Check is skipped!")
-                return
-
             logger.debug("Checking content of web service at %s...", self.url)
             if not (
                     response := self._http_client.get_content_by_css_selector(
