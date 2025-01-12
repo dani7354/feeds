@@ -5,6 +5,8 @@ from email.header import Header
 from email.mime.text import MIMEText
 from typing import Sequence
 
+from feeds.service.encryption import PGPService
+
 
 @dataclasses.dataclass(frozen=True)
 class Configuration:
@@ -55,8 +57,9 @@ class StandardSMTP(EmailClient):
 
 class EncryptedEmailClient(EmailClient):
 
-    def __init__(self, configuration: Configuration):
+    def __init__(self, configuration: Configuration, pgp_service: PGPService):
         super().__init__(configuration)
+        self._pgp_service = pgp_service
 
     def send_email(self, email: EmailMessage) -> None:
         pass
