@@ -31,6 +31,28 @@ class EmailClient:
         raise NotImplementedError
 
 
+"""
+class StandardSMTP(EmailClient):
+    encoding = "utf-8"
+
+    def send_email(self, email: EmailMessage) -> None:
+        mime_message = self._create_message_str(email)
+        context = ssl.create_default_context()
+        with smtplib.SMTP(host=self.configuration.smtp_host, port=self.configuration.smtp_port) as mail_server:
+            mail_server.starttls(context=context)
+            mail_server.login(self.configuration.smtp_user, self.configuration.smtp_password)
+            mail_server.send_message(mime_message)
+
+    def _create_message_str(self, message: EmailMessage) -> MIMEText:
+        mime_text_message = MIMEText(message.body, "html", self.encoding)
+        mime_text_message["Subject"] = Header(message.subject, self.encoding)
+        mime_text_message["From"] = self.configuration.sender
+        mime_text_message["To"] = self.configuration.recipients[0]
+
+        return mime_text_message
+"""
+
+
 class StandardSMTP(EmailClient):
     encoding = "utf-8"
 
