@@ -24,6 +24,7 @@ class EmailMessage:
 
 class EmailClient:
     """ Base class for email clients """
+    
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
@@ -50,6 +51,16 @@ class StandardSMTP(EmailClient):
         mime_text_message["To"] = self.configuration.recipients[0]
 
         return mime_text_message
+
+
+class EncryptedEmailClient(EmailClient):
+
+    def __init__(self, configuration: Configuration):
+        super().__init__(configuration)
+
+    def send_email(self, email: EmailMessage) -> None:
+        pass
+
 
 
 class DummyEmailClient(EmailClient):
