@@ -10,7 +10,7 @@ class PGPService:
     def __init__(self, gpg_home_path: str):
         self.gpg = GPG(gnupghome=gpg_home_path)
         self.gpg.encoding = self.encoding
-        if not (self.gpg.list_keys()):
+        if not self.gpg.list_keys():
             self._import_keys_from_homedir()
             if not self.gpg.list_keys():
                 raise RuntimeError("No keys found in GnuPG home directory")

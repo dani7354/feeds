@@ -24,7 +24,7 @@ class EmailMessage:
 
 class EmailClient:
     """ Base class for email clients """
-    
+
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
