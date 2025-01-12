@@ -23,6 +23,7 @@ class EmailMessage:
 
 
 class EmailClient:
+    """ Base class for email clients """
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
@@ -49,3 +50,10 @@ class StandardSMTP(EmailClient):
         mime_text_message["To"] = self.configuration.recipients[0]
 
         return mime_text_message
+
+
+class DummyEmailClient(EmailClient):
+    """ Dummy email client for debugging locally """
+
+    def send_email(self, email: EmailMessage) -> None:
+        print(f"Sending email with subject: {email.subject}")

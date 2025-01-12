@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 # Install Firefox dependencies. Needed for selenium
 RUN apt update -y \
@@ -14,7 +14,7 @@ RUN apt install nmap -y
 # Cleanup unnecessary stuff
 RUN apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
-ENV VENV_PATH=/opt/venv
+ARG VENV_PATH=/opt/venv
 RUN python3 -m venv "$VENV_PATH"
 ENV PATH="$VENV_PATH/bin:$PATH"
 

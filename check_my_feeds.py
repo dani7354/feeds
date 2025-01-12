@@ -8,7 +8,7 @@ from typing import Any
 
 import schedule
 
-from feeds.email.client import StandardSMTP, Configuration, EmailClient
+from feeds.email.client import StandardSMTP, Configuration, EmailClient, DummyEmailClient
 from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
@@ -19,7 +19,7 @@ from feeds.http.client import (
     HTTPClientDynamic,
 )
 from feeds.service.host_scan import NmapScanService
-from feeds.settings import CONFIG_PATH
+from feeds.settings import CONFIG_PATH, DEBUG
 
 
 class CheckMyFeedsJob:
@@ -50,7 +50,7 @@ class CheckMyFeedsJob:
             sender=self.config["email"]["sender"],
             recipients=self.config["email"]["recipients"],
         )
-        email_client = StandardSMTP(email_client_config)
+        email_client = StandardSMTP(email_client_config) if not DEBUG else DummyEmailClient(email_client_config)
 
         return email_client
 
