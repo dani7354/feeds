@@ -14,3 +14,5 @@ DEBUG=True
 
 `config.dev.json` should be manually created and filled with information about the feeds or pages, which you would like
 to follow. See `config.example.json` for inspiration.
+
+## Running the application in Docker
