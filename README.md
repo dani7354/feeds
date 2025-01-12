@@ -4,8 +4,9 @@
 
 1. Clone the repository
 2. Create virtual env: `$ python3 -m venv venv/ && source venv/bin/activate`
-3. Install dependencies: `$ pip install --upgrade pip && pip install -r requirements.txt`
-4. Create a `.env` file in the root directory and add the following:
+4. Install dependencies: `$ pip install --upgrade pip && pip install -r requirements.txt`
+5. Install pytest `$ pip install pytest`
+6. Create a `.env` file in the root directory and add the following:
 
 ```
 CONFIG_PATH=/local/path/to/project/feeds/config.dev.json
