@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 from typing import Sequence
 
 from feeds.service.encryption import PGPService
+from tests.encryption.test_pgp_service import pgp_service
 
 
 @dataclasses.dataclass(frozen=True)
@@ -36,6 +37,8 @@ class EmailClient:
 
 
 class StandardSMTP(EmailClient):
+    """ Email client that sends emails using SMTP. Default email client. """
+
     encoding = "utf-8"
 
     def send_email(self, email: EmailMessage) -> None:
@@ -55,15 +58,23 @@ class StandardSMTP(EmailClient):
         return mime_text_message
 
 
-class EncryptedEmailClient(EmailClient):
+class EncryptedEmailClient(StandardSMTP):
+    """" Email client that encrypts the email body using PGP (GnuPG) """
 
     def __init__(self, configuration: Configuration, pgp_service: PGPService):
         super().__init__(configuration)
         self._pgp_service = pgp_service
 
-    def send_email(self, email: EmailMessage) -> None:
-        pass
+    def _create_message_str(self, message: EmailMessage) -> MIMEText:
+        mime_text_message = MIMEText(
+            self._pgp_service.encrypt_string(message.body, recipient=self.configuration.recipients[0]),
+            "html",
+            self.encoding)
+        mime_text_message["Subject"] = Header(message.subject, self.encoding)
+        mime_text_message["From"] = self.configuration.sender
+        mime_text_message["To"] = self.configuration.recipients[0]
 
+        return mime_text_message
 
 
 class DummyEmailClient(EmailClient):
