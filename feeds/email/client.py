@@ -23,6 +23,7 @@ class Configuration:
     smtp_password: str
     sender: str
     recipients: Sequence[str]
+    gpg_home_path: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
