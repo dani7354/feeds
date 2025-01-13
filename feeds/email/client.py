@@ -7,7 +7,6 @@ from enum import StrEnum
 from typing import Sequence
 
 from feeds.service.encryption import PGPService
-from tests.encryption.test_pgp_service import pgp
 
 
 class MimeMessageField(StrEnum):
@@ -68,9 +67,9 @@ class StandardSMTP(EmailClient):
 class EncryptedEmailClient(StandardSMTP):
     """" Email client that encrypts the email body using PGP (GnuPG) """
 
-    def __init__(self, configuration: Configuration, pgp: PGPService):
+    def __init__(self, configuration: Configuration, pgp_service: PGPService):
         super().__init__(configuration)
-        self._pgp_service = pgp
+        self._pgp_service = pgp_service
 
     def _create_message_str(self, message: EmailMessage) -> MIMEText:
         mime_text_message = MIMEText(
@@ -88,4 +87,4 @@ class DummyEmailClient(EmailClient):
     """ Dummy email client for debugging locally """
 
     def send_email(self, email: EmailMessage) -> None:
-        print(f"Sending email with subject: {email.subject}")
+        print(f"Sending email with subject: {email.subject} to {self.configuration.recipients[0]}")
