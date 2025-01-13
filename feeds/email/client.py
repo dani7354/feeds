@@ -3,10 +3,17 @@ import smtplib
 import ssl
 from email.header import Header
 from email.mime.text import MIMEText
+from enum import StrEnum
 from typing import Sequence
 
 from feeds.service.encryption import PGPService
-from tests.encryption.test_pgp_service import pgp_service
+from tests.encryption.test_pgp_service import pgp
+
+
+class MimeMessageField(StrEnum):
+    SUBJECT = "Subject"
+    FROM = "From"
+    TO = "To"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -51,9 +58,9 @@ class StandardSMTP(EmailClient):
 
     def _create_message_str(self, message: EmailMessage) -> MIMEText:
         mime_text_message = MIMEText(message.body, "html", self.encoding)
-        mime_text_message["Subject"] = Header(message.subject, self.encoding)
-        mime_text_message["From"] = self.configuration.sender
-        mime_text_message["To"] = self.configuration.recipients[0]
+        mime_text_message[MimeMessageField.SUBJECT] = Header(message.subject, self.encoding)
+        mime_text_message[MimeMessageField.FROM] = self.configuration.sender
+        mime_text_message[MimeMessageField.TO] = self.configuration.recipients[0]
 
         return mime_text_message
 
@@ -61,18 +68,18 @@ class StandardSMTP(EmailClient):
 class EncryptedEmailClient(StandardSMTP):
     """" Email client that encrypts the email body using PGP (GnuPG) """
 
-    def __init__(self, configuration: Configuration, pgp_service: PGPService):
+    def __init__(self, configuration: Configuration, pgp: PGPService):
         super().__init__(configuration)
-        self._pgp_service = pgp_service
+        self._pgp_service = pgp
 
     def _create_message_str(self, message: EmailMessage) -> MIMEText:
         mime_text_message = MIMEText(
             self._pgp_service.encrypt_string(message.body, recipient=self.configuration.recipients[0]),
             "html",
             self.encoding)
-        mime_text_message["Subject"] = Header(message.subject, self.encoding)
-        mime_text_message["From"] = self.configuration.sender
-        mime_text_message["To"] = self.configuration.recipients[0]
+        mime_text_message[MimeMessageField.SUBJECT] = Header(message.subject, self.encoding)
+        mime_text_message[MimeMessageField.FROM] = self.configuration.sender
+        mime_text_message[MimeMessageField.TO] = self.configuration.recipients[0]
 
         return mime_text_message
 

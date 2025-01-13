@@ -7,7 +7,7 @@ VALID_RECIPENT_EMAIL = "robert@robert.dk"
 
 
 @pytest.fixture
-def pgp_service(tmp_path):
+def pgp(tmp_path):
     gpg_home_path = str(tmp_path)
     gpg = GPG(gnupghome=gpg_home_path)
     key_input = gpg.gen_key_input(
@@ -23,11 +23,11 @@ def pgp_service(tmp_path):
     return PGPService(gpg_home_path=str(tmp_path))
 
 
-def test_encrypt_string_works_with_email_recipient(pgp_service):
-    encrypted_message = pgp_service.encrypt_string("Hello, World!", recipient=VALID_RECIPENT_EMAIL)
+def test_encrypt_string_works_with_email_recipient(pgp):
+    encrypted_message = pgp.encrypt_string("Hello, World!", recipient=VALID_RECIPENT_EMAIL)
     assert encrypted_message
 
 
-def test_encrypt_string_fails_with_invalid_recipient(pgp_service):
+def test_encrypt_string_fails_with_invalid_recipient(pgp):
     with pytest.raises(ValueError):
-        pgp_service.encrypt_string("Hello, World!", recipient="soren@soren.dk")
+        pgp.encrypt_string("Hello, World!", recipient="soren@soren.dk")
