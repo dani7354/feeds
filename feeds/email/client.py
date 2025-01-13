@@ -77,6 +77,7 @@ class EncryptedEmailClient(StandardSMTP):
     def _create_message(self, message: EmailMessage) -> MIMEBase:
         mime_message = MIMEBase(_maintype="multipart", _subtype="encrypted", protocol="application/pgp-encrypted")
         mime_message.add_header(_name="Content-Type", _value="multipart/mixed", protected_headers="v1")
+        mime_message[MimeMessageField.SUBJECT] = Header(message.subject, self.encoding)
         mime_message[MimeMessageField.FROM] = self.configuration.sender
         mime_message[MimeMessageField.TO] = self.configuration.recipients[0]
 
@@ -89,7 +90,10 @@ class EncryptedEmailClient(StandardSMTP):
         pgp_payload.add_header(_name="Content-Type", _value="application/octet-stream", name="encrypted.asc")
         pgp_payload.add_header(_name="Content-Description", _value="OpenPGP encrypted message")
         pgp_payload.add_header(_name="Content-Disposition", _value="inline", filename="encrypted.asc")
-        pgp_payload.set_payload(self._pgp_service.encrypt_string(message.body, self.configuration.recipients[0]))
+
+        encrypted_message = MIMEText(message.body, "html", self.encoding)
+        pgp_payload.set_payload(
+            self._pgp_service.encrypt_string(encrypted_message.as_string(), self.configuration.recipients[0]))
 
         mime_message.attach(pgp_version_info_message)
         mime_message.attach(pgp_payload)
