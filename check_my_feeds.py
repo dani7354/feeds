@@ -50,14 +50,15 @@ class CheckMyFeedsJob:
             smtp_password=self.config["email"]["smtp_password"],
             sender=self.config["email"]["sender"],
             recipients=self.config["email"]["recipients"],
+            gpg_home_path=self.config["email"].get("gpg_home_directory"),
         )
 
         if DEBUG:
             self.logger.info("Using email client: DummyEmailClient (for debugging only!)")
             email_client = DummyEmailClient(email_client_config)
-        elif gpg_home_path := self.config["email"].get("gpg_home_directory"):
+        elif email_client_config.gpg_home_path:
             logging.info("Using email client: EncryptedEmailClient...")
-            email_client = EncryptedEmailClient(email_client_config, PGPService(gpg_home_path))
+            email_client = EncryptedEmailClient(email_client_config, PGPService(email_client_config.gpg_home_path))
         else:
             logging.info("Using email client: StandardSMTP...")
             email_client = StandardSMTP(email_client_config)
