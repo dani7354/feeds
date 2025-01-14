@@ -8,7 +8,7 @@ from typing import Any
 
 import schedule
 
-from feeds.email.client import StandardSMTP, Configuration, EmailClient, DummyEmailClient
+from feeds.email.client import StandardSMTP, Configuration, EmailClient, DummyEmailClient, EncryptedEmailClient
 from feeds.feed.base import FeedCheckFailedError, FeedSchedule
 from feeds.feed.base import FeedChecker
 from feeds.feed.factory import create_feed_checkers
@@ -18,6 +18,7 @@ from feeds.http.client import (
     HTTPClientDynamicBase,
     HTTPClientDynamic,
 )
+from feeds.service.encryption import PGPService
 from feeds.service.host_scan import NmapScanService
 from feeds.settings import CONFIG_PATH, DEBUG
 
@@ -49,8 +50,18 @@ class CheckMyFeedsJob:
             smtp_password=self.config["email"]["smtp_password"],
             sender=self.config["email"]["sender"],
             recipients=self.config["email"]["recipients"],
+            gpg_home_path=self.config["email"].get("gpg_home_directory"),
         )
-        email_client = StandardSMTP(email_client_config) if not DEBUG else DummyEmailClient(email_client_config)
+
+        if DEBUG:
+            self.logger.info("Using email client: DummyEmailClient (for debugging only!)")
+            email_client = DummyEmailClient(email_client_config)
+        elif email_client_config.gpg_home_path:
+            logging.info("Using email client: EncryptedEmailClient...")
+            email_client = EncryptedEmailClient(email_client_config, PGPService(email_client_config.gpg_home_path))
+        else:
+            logging.info("Using email client: StandardSMTP...")
+            email_client = StandardSMTP(email_client_config)
 
         return email_client
 

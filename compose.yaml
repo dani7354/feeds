@@ -10,3 +10,4 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./config.dev.json:/app/config.dev.json:ro
+      - ./gpg:/app/gpg

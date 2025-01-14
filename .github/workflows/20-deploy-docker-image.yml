@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           logout: true
 
-      - name: Build and push nginx
+      - name: Build and push image
         uses: docker/build-push-action@v3
         with:
           file: Dockerfile

@@ -3,3 +3,4 @@ schedule
 beautifulsoup4
 selenium
 python-slugify
+python-gnupg
