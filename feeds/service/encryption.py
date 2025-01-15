@@ -35,5 +35,8 @@ class PGPService:
 
     def _ensure_correct_directory_permissions(self) -> None:
         os.chmod(self.gpg.gnupghome, 0o700)
-        for file in os.listdir(self.gpg.gnupghome):
-            os.chmod(os.path.join(self.gpg.gnupghome, file), 0o600)
+        for entry in os.listdir(self.gpg.gnupghome):
+            if os.path.isdir(os.path.join(self.gpg.gnupghome, entry)):
+                os.chmod(os.path.join(self.gpg.gnupghome, entry), 0o700)
+            else:
+                os.chmod(os.path.join(self.gpg.gnupghome, entry), 0o600)
