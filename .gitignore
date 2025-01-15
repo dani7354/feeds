@@ -8,7 +8,12 @@ logs/*
 config.*.json
 !config.example.json
 
+gpg/*
+!gpg/.empty
 *.env
+*.kbx
+*.gpg
+*.asc
 
 __pycache__/
 .idea/
