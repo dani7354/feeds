@@ -68,13 +68,12 @@ class HtmlContentFileService(ContentFileServiceBase):
     def get_new_filename(self) -> str:
         return f"{self.base_filename}_{datetime.now().strftime(self.date_format)}.html"
 
-    def get_diff(self, new_content: str) -> str | None:
-        latest_content = self.read_latest_content().decode(errors="ignore")
-        if not latest_content:
-            return None
+    def get_diff(self, new_content: str) -> str:
+        if not (latest_content := self.read_latest_content()):
+            latest_content = b""
 
         diff_content = unified_diff(
-            latest_content.splitlines(keepends=True),
+            latest_content.decode(errors="ignore").splitlines(keepends=True),
             new_content.splitlines(keepends=True),
             fromfile="Latest saved content",
             tofile="New content")
