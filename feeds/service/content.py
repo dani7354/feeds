@@ -1,6 +1,7 @@
 import logging
 import os.path
 from datetime import datetime
+from difflib import unified_diff
 
 
 class ContentFileServiceBase:
@@ -66,3 +67,16 @@ class HtmlContentFileService(ContentFileServiceBase):
 
     def get_new_filename(self) -> str:
         return f"{self.base_filename}_{datetime.now().strftime(self.date_format)}.html"
+
+    def get_diff(self, new_content: str) -> str | None:
+        latest_content = self.read_latest_content().decode(errors="ignore")
+        if not latest_content:
+            return None
+
+        diff_content = unified_diff(
+            latest_content.splitlines(keepends=True),
+            new_content.splitlines(keepends=True),
+            fromfile="Latest saved content",
+            tofile="New content")
+
+        return "".join(diff_content)
