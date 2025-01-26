@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from slugify import slugify
 
 from feeds.email.client import EmailClient, EmailMessage
+from feeds.email.html import create_heading_one
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.http.client import HTTPClientBase, HTTPClientDynamicBase
 from feeds.http.log import RequestLogService
@@ -116,12 +117,15 @@ class PageContentChecker(WebCheckerBase):
             html_node = response_content_bs.select_one(self.css_selector)
             is_content_updated = self._is_content_updated(str(html_node))
             self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(str(html_node).encode(encoding=self._content_encoding))
+            html_node_str = str(html_node)
+            self.content_file_service.save_content(html_node_str.encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
+                message_body = (f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
+                                f"{self.content_file_service.get_diff(html_node_str)}")
                 self.send_email(
                     subject=f"{self.name}: content updated!",
-                    body=f"Content of {self.name} at {self.url} has been updated.",
+                    body=message_body,
                 )
             else:
                 self._logger.info("Content not updated.")
@@ -170,15 +174,16 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 self._logger.error("%s: Failed to get response from %s", self.name, self.url)
                 self.request_log_service.log_request(self.check_failed)
                 return
-
-            is_content_updated = self._is_content_updated(str(response))
+            response_str = str(response)
+            is_content_updated = self._is_content_updated(response_str)
             self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(str(response).encode(encoding=self._content_encoding))
+            self.content_file_service.save_content(response_str.encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
                 self.send_email(
                     subject=f"{self.name}: content updated!",
-                    body=f"Content of {self.name} at {self.url} has been updated.",
+                    body=f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
+                         f"{self.content_file_service.get_diff(response_str)}",
                 )
             else:
                 self._logger.info("Content not updated.")
