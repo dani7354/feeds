@@ -174,15 +174,16 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 self._logger.error("%s: Failed to get response from %s", self.name, self.url)
                 self.request_log_service.log_request(self.check_failed)
                 return
-
-            is_content_updated = self._is_content_updated(str(response))
+            response_str = str(response)
+            is_content_updated = self._is_content_updated(response_str)
             self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(str(response).encode(encoding=self._content_encoding))
+            self.content_file_service.save_content(response_str.encode(encoding=self._content_encoding))
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
                 self.send_email(
                     subject=f"{self.name}: content updated!",
-                    body=f"Content of {self.name} at {self.url} has been updated.",
+                    body=f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
+                         f"{self.content_file_service.get_diff(response_str)}",
                 )
             else:
                 self._logger.info("Content not updated.")
