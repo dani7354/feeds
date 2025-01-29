@@ -21,6 +21,10 @@ def create_paragraph(text: str) -> str:
     return f"<p>{text}</p>"
 
 
+def create_pre(text: str) -> str:
+    return f"<pre>{text}</pre>"
+
+
 def create_table(table_header: list[str], table_items: list[tuple]) -> str:
     table = [f"<{HTML_TABLE}>", f"<{HTML_TR}>"]
 
