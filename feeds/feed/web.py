@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from slugify import slugify
 
 from feeds.email.client import EmailClient, EmailMessage
-from feeds.email.html import create_heading_one
+from feeds.email.html import create_heading_one, create_pre
 from feeds.feed.base import FeedChecker, FeedCheckFailedError
 from feeds.http.client import HTTPClientBase, HTTPClientDynamicBase
 from feeds.http.log import RequestLogService
@@ -122,7 +122,7 @@ class PageContentChecker(WebCheckerBase):
             if is_content_updated:
                 self._logger.info("Content updated. Saving content...")
                 message_body = (f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
-                                f"{self.content_file_service.get_diff(html_node_str)}")
+                                f"{create_pre(self.content_file_service.get_diff(html_node_str))}")
                 self.send_email(
                     subject=f"{self.name}: content updated!",
                     body=message_body,
@@ -183,7 +183,7 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 self.send_email(
                     subject=f"{self.name}: content updated!",
                     body=f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
-                         f"{self.content_file_service.get_diff(response_str)}",
+                         f"{create_pre(self.content_file_service.get_diff(response_str))}",
                 )
             else:
                 self._logger.info("Content not updated.")
