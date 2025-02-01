@@ -115,11 +115,8 @@ class PageContentChecker(WebCheckerBase):
 
             response_content_bs = BeautifulSoup(response, "html.parser")
             html_node = response_content_bs.select_one(self.css_selector)
-            is_content_updated = self._is_content_updated(str(html_node))
-            self.request_log_service.log_request(int(is_content_updated))
             html_node_str = str(html_node)
-            self.content_file_service.save_content(html_node_str.encode(encoding=self._content_encoding))
-            if is_content_updated:
+            if is_content_updated := self._is_content_updated(str(html_node)):
                 self._logger.info("Content updated. Saving content...")
                 message_body = (f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
                                 f"{create_pre(self.content_file_service.get_diff(html_node_str))}")
@@ -129,6 +126,9 @@ class PageContentChecker(WebCheckerBase):
                 )
             else:
                 self._logger.info("Content not updated.")
+
+            self.request_log_service.log_request(int(is_content_updated))
+            self.content_file_service.save_content(html_node_str.encode(encoding=self._content_encoding))
             self.content_file_service.clean_up_content_dir()
         except Exception as ex:
             self._logger.error(ex)
@@ -174,11 +174,9 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 self._logger.error("%s: Failed to get response from %s", self.name, self.url)
                 self.request_log_service.log_request(self.check_failed)
                 return
+
             response_str = str(response)
-            is_content_updated = self._is_content_updated(response_str)
-            self.request_log_service.log_request(int(is_content_updated))
-            self.content_file_service.save_content(response_str.encode(encoding=self._content_encoding))
-            if is_content_updated:
+            if is_content_updated := self._is_content_updated(response_str):
                 self._logger.info("Content updated. Saving content...")
                 self.send_email(
                     subject=f"{self.name}: content updated!",
@@ -187,6 +185,9 @@ class PageContentCheckerDynamic(WebCheckerBase):
                 )
             else:
                 self._logger.info("Content not updated.")
+
+            self.request_log_service.log_request(int(is_content_updated))
+            self.content_file_service.save_content(response_str.encode(encoding=self._content_encoding))
             self.content_file_service.clean_up_content_dir()
         except Exception as ex:
             self._logger.error(ex)
