@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 # Install Firefox dependencies. Needed for selenium
 RUN apt update -y \

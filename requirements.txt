@@ -1,6 +1,6 @@
-requests
-schedule
-beautifulsoup4
-selenium
-python-slugify
-python-gnupg
+requests==2.34.2
+schedule==1.2.2
+beautifulsoup4==4.15.0
+selenium==4.49.0
+python-slugify==9.0.0
+python-gnupg==0.5.6
