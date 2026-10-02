@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 # Install Firefox dependencies. Needed for selenium
 RUN apt update -y \
@@ -19,12 +19,12 @@ RUN python3 -m venv "$VENV_PATH"
 ENV PATH="$VENV_PATH/bin:$PATH"
 
 WORKDIR /app
-COPY requirements.txt .
+COPY pyproject.toml .
 COPY feeds feeds
 COPY check_my_feeds.py .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install .
 
 ENV PYTHONPATH="/app"
 
-CMD ["python3", "check_my_feeds.py"]
+CMD ["check_my_feeds"]

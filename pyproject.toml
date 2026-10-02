@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "check-my-feeds"
+version = "0.1.0"
+description = "A service that monitors feeds and web pages."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4",
+    "python-gnupg",
+    "python-slugify",
+    "requests",
+    "schedule",
+    "selenium",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pylint",
+    "pytest",
+]
+
+[project.scripts]
+check-my-feeds = "check_my_feeds:main"
+
+[tool.setuptools]
+py-modules = ["check_my_feeds"]
+
+[tool.setuptools.packages.find]
+include = ["feeds*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
