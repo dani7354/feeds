@@ -27,4 +27,4 @@ RUN pip install --upgrade pip && pip install .
 
 ENV PYTHONPATH="/app"
 
-CMD ["check_my_feeds"]
+CMD ["check-my-feeds"]
