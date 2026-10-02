@@ -118,8 +118,10 @@ class PageContentChecker(WebCheckerBase):
             html_node_str = str(html_node)
             if is_content_updated := self._is_content_updated(str(html_node)):
                 self._logger.info("Content updated. Saving content...")
-                message_body = (f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
-                                f"{create_pre(self.content_file_service.get_diff(html_node_str))}")
+                message_body = (
+                    f"{create_heading_one(f"Content of {self.name} at {self.url} has been updated.")}\n"
+                    f"{create_pre(self.content_file_service.get_diff(html_node_str))}"
+                )
                 self.send_email(
                     subject=f"{self.name}: content updated!",
                     body=message_body,

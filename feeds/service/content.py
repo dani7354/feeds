@@ -77,10 +77,10 @@ class HtmlContentFileService(ContentFileServiceBase):
             latest_content.decode(errors="ignore").splitlines(keepends=True),
             new_content.splitlines(keepends=True),
             fromfile="Latest saved content",
-            tofile="New content")
+            tofile="New content",
+        )
 
         new_line = "\n"
-        diff_content_escaped_html = [f"{html.escape(line.rstrip(new_line))}"
-                                     for line in unified_diff_gen]
+        diff_content_escaped_html = [f"{html.escape(line.rstrip(new_line))}" for line in unified_diff_gen]
 
         return f"{new_line}".join(diff_content_escaped_html)

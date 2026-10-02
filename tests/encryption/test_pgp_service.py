@@ -11,10 +11,8 @@ def pgp_encryption_service(tmp_path):
     gpg_home_path = str(tmp_path)
     gpg = GPG(gnupghome=gpg_home_path)
     key_input = gpg.gen_key_input(
-        name_email=f"Robert <{VALID_RECIPENT_EMAIL}>",
-        passphrase="Robert123",
-        key_type="RSA",
-        key_length=4096)
+        name_email=f"Robert <{VALID_RECIPENT_EMAIL}>", passphrase="Robert123", key_type="RSA", key_length=4096
+    )
     key = gpg.gen_key(key_input)
     public_key = gpg.export_keys(key.fingerprint)
     with open(tmp_path / "public_key.asc", "w") as key_file:

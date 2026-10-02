@@ -4,7 +4,8 @@ from gnupg import GPG
 
 
 class PGPService:
-    """ PGP Service: encrypt strings and files using GnuPG """
+    """PGP Service: encrypt strings and files using GnuPG"""
+
     encoding = "utf-8"
     key_file_extensions = ".asc"
     new_key_trust_level = "TRUST_ULTIMATE"

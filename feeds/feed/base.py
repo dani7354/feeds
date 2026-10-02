@@ -9,7 +9,6 @@ class FeedSchedule(StrEnum):
     HOURLY = "hourly"
     DAILY = "daily"
     WEEKLY = "weekly"
-    MONTHLY = "monthly"
 
 
 class FeedChecker:
