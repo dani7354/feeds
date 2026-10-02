@@ -1,4 +1,6 @@
 import requests
+
+# pylint: disable=E0611
 from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options

@@ -35,7 +35,7 @@ class EmailMessage:
 
 
 class EmailClient:
-    """ Base class for email clients """
+    """Base class for email clients"""
 
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
@@ -46,7 +46,7 @@ class EmailClient:
 
 
 class StandardSMTP(EmailClient):
-    """ Email client that sends emails using SMTP. Default email client. """
+    """Email client that sends emails using SMTP. Default email client."""
 
     encoding = "utf-8"
 
@@ -68,7 +68,7 @@ class StandardSMTP(EmailClient):
 
 
 class EncryptedEmailClient(StandardSMTP):
-    """" Email client that encrypts the email body using PGP (GnuPG) """
+    """ " Email client that encrypts the email body using PGP (GnuPG)"""
 
     def __init__(self, configuration: Configuration, pgp_service: PGPService):
         super().__init__(configuration)
@@ -93,7 +93,8 @@ class EncryptedEmailClient(StandardSMTP):
 
         encrypted_message = MIMEText(message.body, "html", self.encoding)
         pgp_payload.set_payload(
-            self._pgp_service.encrypt_string(encrypted_message.as_string(), self.configuration.recipients[0]))
+            self._pgp_service.encrypt_string(encrypted_message.as_string(), self.configuration.recipients[0])
+        )
 
         mime_message.attach(pgp_version_info_message)
         mime_message.attach(pgp_payload)
@@ -102,7 +103,7 @@ class EncryptedEmailClient(StandardSMTP):
 
 
 class DummyEmailClient(EmailClient):
-    """ Dummy email client for debugging locally """
+    """Dummy email client for debugging locally"""
 
     def send_email(self, email: EmailMessage) -> None:
         print(f"Sending email with subject: {email.subject} to {self.configuration.recipients[0]}")
