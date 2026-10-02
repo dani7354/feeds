@@ -20,6 +20,7 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 
 WORKDIR /app
 COPY pyproject.toml .
+COPY README.md .
 COPY feeds feeds
 COPY check_my_feeds.py .
 
